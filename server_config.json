@@ -1,0 +1,4 @@
+{
+  "apiUrl": "https://your-colab-tunnel.trycloudflare.com",
+  "description": "Đặt tệp này cùng thư mục với index.html. Thay giá trị apiUrl bằng đường link https://xxxx.trycloudflare.com từ Google Colab."
+}
