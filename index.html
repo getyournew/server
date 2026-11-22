@@ -647,6 +647,85 @@
                 background: rgba(148, 163, 184, 0.3);
                 border-radius: 9999px;
             }
+        
+            /* =========================================================================
+       5. CONSOLE / TERMINAL OUTPUT & THANH TIẾN TRÌNH 1-100%
+       ========================================================================= */
+            .sgu-terminal-window {
+                background: linear-gradient(
+                    180deg,
+                    rgba(10, 15, 29, 0.97) 0%,
+                    rgba(5, 9, 19, 0.99) 100%
+                );
+                border: 1px solid rgba(var(--accent-1-rgb), 0.36);
+                box-shadow:
+                    0 20px 44px -14px rgba(0, 0, 0, 0.78),
+                    inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+                color: #e2e8f0;
+            }
+
+            .sgu-terminal-header {
+                background: rgba(15, 23, 42, 0.95);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            }
+
+            .sgu-terminal-progress-bar-box {
+                background: linear-gradient(
+                    180deg,
+                    rgba(15, 24, 44, 0.94) 0%,
+                    rgba(11, 18, 34, 0.94) 100%
+                );
+                border-bottom: 1px solid rgba(var(--accent-1-rgb), 0.22);
+            }
+
+            .sgu-progress-track {
+                position: relative;
+                background: rgba(255, 255, 255, 0.08);
+                box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+            }
+
+            .sgu-progress-ticks {
+                position: absolute;
+                inset: 0;
+                background-image: repeating-linear-gradient(
+                    to right,
+                    transparent 0%,
+                    transparent calc(10% - 1px),
+                    rgba(5, 9, 19, 0.45) calc(10% - 1px),
+                    rgba(5, 9, 19, 0.45) 10%
+                );
+                pointer-events: none;
+            }
+
+            .sgu-terminal-body {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+            }
+
+            .term-pkg-chip {
+                background: rgba(255, 255, 255, 0.035);
+                border: 1px solid rgba(255, 255, 255, 0.07);
+                transition: background-color 0.15s ease, border-color 0.15s ease;
+            }
+
+            .term-pkg-chip:hover {
+                background: rgba(255, 255, 255, 0.065);
+                border-color: rgba(var(--accent-1-rgb), 0.3);
+            }
+
+            @keyframes termCursorBlink {
+                0%, 49% { opacity: 1; }
+                50%, 100% { opacity: 0; }
+            }
+
+            .term-cursor {
+                display: inline-block;
+                width: 6px;
+                height: 12px;
+                background-color: var(--accent-1);
+                vertical-align: middle;
+                animation: termCursorBlink 1s infinite;
+            }
         </style>
     </head>
     <body class="relative antialiased">
@@ -782,6 +861,23 @@
                                 style="background: var(--chip-bg)"
                             >
                                 Auto 100%
+                            </span>
+                        </button>
+
+                        <!-- Trạng thái Server (Hoạt động / Đang tắt) -->
+                        <button
+                            type="button"
+                            id="headerServerStatusBtn"
+                            onclick="handleHeaderServerStatusClick()"
+                            class="liquid-chip px-3.5 py-2 rounded-full text-xs font-semibold text-main flex items-center gap-2 cursor-pointer"
+                            title="Nhấn để kiểm tra lại trạng thái máy chủ đồng bộ SGU"
+                        >
+                            <span
+                                id="headerServerDot"
+                                class="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0"
+                            ></span>
+                            <span id="headerServerStatusText" class="font-mono-code text-[11px]">
+                                Server: Kiểm tra...
                             </span>
                         </button>
 
@@ -1194,13 +1290,28 @@
                     class="flex items-start sm:items-center justify-between gap-3 pb-3"
                     style="border-bottom: 1px solid var(--grid-line)"
                 >
-                    <div>
-                        <h2
-                            class="text-base sm:text-lg font-extrabold text-main"
-                        >
-                            Đồng bộ tự động từ SGU
-                        </h2>
-                        <p class="text-xs text-sub mt-0.5">
+                    <div class="flex flex-col gap-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h2
+                                class="text-base sm:text-lg font-extrabold text-main"
+                            >
+                                Đồng bộ tự động từ SGU
+                            </h2>
+                            <button
+                                type="button"
+                                id="modalServerStatusBadge"
+                                onclick="checkServerHealth(false)"
+                                class="liquid-chip inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono-code font-semibold text-main cursor-pointer"
+                                title="Nhấn để kiểm tra lại kết nối máy chủ"
+                            >
+                                <span
+                                    id="modalServerDot"
+                                    class="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0"
+                                ></span>
+                                <span id="modalServerStatusText">Đang kiểm tra server...</span>
+                            </button>
+                        </div>
+                        <p class="text-xs text-sub">
                             Nhập MSSV & Mật khẩu cổng đào tạo để quét toàn bộ
                             học kỳ và lưu offline trên thiết bị
                         </p>
@@ -1418,98 +1529,123 @@
                     </button>
                 </div>
 
-                <!-- Tiến trình trực tiếp -->
+                <!-- Cửa sổ Bash / Console Output với thanh tiến trình 1-100% ghim nổi bật -->
                 <div
-                    class="liquid-chip rounded-3xl p-4 flex flex-col sm:flex-row items-center gap-4"
+                    class="sgu-terminal-window rounded-2xl overflow-hidden flex flex-col"
                 >
+                    <!-- Thanh tiêu đề Bash -->
                     <div
-                        class="relative w-20 h-20 shrink-0 flex items-center justify-center"
+                        class="sgu-terminal-header px-3.5 py-2 flex items-center justify-between gap-2"
                     >
-                        <svg class="w-20 h-20 -rotate-90" viewBox="0 0 96 96">
-                            <circle
-                                cx="48"
-                                cy="48"
-                                r="40"
-                                fill="none"
-                                stroke="rgba(148,163,184,0.2)"
-                                stroke-width="7"
-                            />
-                            <circle
-                                id="hudProgressRing"
-                                cx="48"
-                                cy="48"
-                                r="40"
-                                fill="none"
-                                stroke="var(--accent-1)"
-                                stroke-width="7"
-                                stroke-linecap="round"
-                                stroke-dasharray="251.33"
-                                stroke-dashoffset="251.33"
-                                style="transition: stroke-dashoffset 0.3s ease"
-                            />
-                        </svg>
-                        <span
-                            id="hudPercentText"
-                            class="absolute font-mono-code text-base font-extrabold text-main"
-                            >0%</span
-                        >
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="flex items-center gap-1.5 shrink-0" aria-hidden="true">
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></span>
+                            </div>
+                            <span
+                                class="font-mono-code text-[11px] font-medium text-slate-400 truncate ml-1"
+                            >
+                                bash — sgu-sync
+                            </span>
+                        </div>
+
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span
+                                id="hudStatusPill"
+                                class="font-mono-code text-[10px] font-bold px-2 py-0.5 rounded bg-white/5 border border-white/10 text-cyan-300"
+                            >
+                                READY
+                            </span>
+                            <span
+                                id="hudStopwatch"
+                                class="font-mono-code text-[11px] text-slate-400 tabular-nums"
+                            >
+                                00:00.0s
+                            </span>
+                            <button
+                                type="button"
+                                onclick="copyTerminalOutput()"
+                                class="font-mono-code text-[10px] px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 border border-white/10 text-slate-300 cursor-pointer transition"
+                                title="Sao chép log"
+                            >
+                                Copy
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="flex-1 w-full flex flex-col gap-2">
-                        <div
-                            class="flex flex-wrap items-center justify-between gap-2"
-                        >
-                            <span
-                                id="hudStudentPill"
-                                class="text-xs font-bold text-main"
-                                >Chưa bắt đầu phiên đồng bộ</span
-                            >
-                            <div class="flex items-center gap-2">
+                    <!-- Thanh tiến trình 1% -> 100% luôn hiển thị rõ ngay đầu cửa sổ quét -->
+                    <div class="sgu-terminal-progress-bar-box px-3.5 py-2.5 flex flex-col gap-1.5 font-mono-code">
+                        <div class="flex items-center justify-between gap-2 text-[11px]">
+                            <div class="flex items-center gap-1.5 min-w-0">
                                 <span
-                                    id="hudStatusPill"
-                                    class="liquid-chip px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-main"
+                                    id="terminalBarSpinner"
+                                    class="font-bold shrink-0"
+                                    style="color: var(--accent-1);"
+                                >●</span>
+                                <span
+                                    id="hudSubStatusText"
+                                    class="text-slate-200 font-medium truncate"
                                 >
-                                    Sẵn sàng
+                                    Sẵn sàng quét thời khóa biểu
                                 </span>
+                            </div>
+
+                            <div class="flex items-center gap-2 shrink-0 tabular-nums">
                                 <span
-                                    id="hudStopwatch"
-                                    class="font-mono-code text-xs text-sub"
-                                    >00:00.0s</span
-                                >
+                                    id="hudWeekCounterText"
+                                    class="text-[10.5px] text-slate-400"
+                                >0/0 tuần</span>
+                                <span
+                                    id="hudPercentText"
+                                    class="px-2 py-0.5 rounded-md text-xs font-extrabold border"
+                                    style="
+                                        color: var(--accent-1);
+                                        background: rgba(var(--accent-1-rgb), 0.14);
+                                        border-color: rgba(var(--accent-1-rgb), 0.4);
+                                    "
+                                >0%</span>
                             </div>
                         </div>
 
-                        <div
-                            class="w-full h-2.5 rounded-full overflow-hidden"
-                            style="background: var(--grid-line)"
-                        >
-                            <div
-                                id="hudShimmerBar"
-                                class="shimmer-bar-fill h-full rounded-full"
-                                style="width: 0%"
-                            ></div>
-                        </div>
-
-                        <div
-                            class="flex items-center justify-between gap-2 text-[11px] text-sub"
-                        >
-                            <span id="hudSubStatusText" class="truncate"
-                                >Nhập MSSV & Mật khẩu rồi nhấn "Quét & Lưu
-                                lịch"</span
-                            >
-                            <span
-                                id="hudWeekCounterText"
-                                class="font-mono-code font-semibold shrink-0"
-                                >0/0 tuần</span
-                            >
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-[10px] text-slate-500 tabular-nums shrink-0">1%</span>
+                            <div class="sgu-progress-track flex-1 h-2.5 rounded-full overflow-hidden">
+                                <div
+                                    id="hudShimmerBar"
+                                    class="shimmer-bar-fill h-full rounded-full"
+                                    style="width: 0%"
+                                ></div>
+                                <div class="sgu-progress-ticks"></div>
+                            </div>
+                            <span class="text-[10px] text-slate-500 tabular-nums shrink-0">100%</span>
                         </div>
                     </div>
-                </div>
 
-                <div
-                    id="hudWeekMatrix"
-                    class="grid grid-cols-3 sm:grid-cols-6 gap-1.5"
-                ></div>
+                    <!-- Nội dung Console Output -->
+                    <div
+                        id="terminalScrollViewport"
+                        class="sgu-terminal-body p-3.5 max-h-[240px] sm:max-h-[270px] overflow-y-auto font-mono-code text-[11px] leading-relaxed flex flex-col gap-2"
+                    >
+                        <!-- Dòng lệnh thực thi -->
+                        <div class="flex items-center gap-1.5 text-slate-300">
+                            <span class="font-bold select-none" style="color: var(--accent-3);">$</span>
+                            <span id="terminalCommandLine" class="text-slate-100 truncate">
+                                sgu-sync --scope all
+                            </span>
+                        </div>
+
+                        <!-- Nhật ký sự kiện chính -->
+                        <div id="terminalLogStream" class="flex flex-col gap-1">
+                            <div class="text-slate-400">
+                                Sẵn sàng tải dữ liệu thời khóa biểu từ cổng đào tạo SGU<span class="term-cursor ml-1.5"></span>
+                            </div>
+                        </div>
+
+                        <!-- Danh sách gói tuần đã tải (lưới 2 cột gọn gàng) -->
+                        <div id="hudWeekMatrix" class="flex flex-col gap-1.5"></div>
+                    </div>
+                </div>
 
                 <div
                     id="hudCompletionBanner"
@@ -2854,6 +2990,10 @@
             // =========================================================================
             function setSyncScope(scope) {
                 liveSyncState.scope = scope === "current" ? "current" : "all";
+                const cmdEl = document.getElementById("terminalCommandLine");
+                if (cmdEl && !liveSyncState.isRunning) {
+                    cmdEl.textContent = `sgu-sync --scope ${liveSyncState.scope}`;
+                }
                 const btnAll = document.getElementById("btnSyncScopeAll");
                 const btnCur = document.getElementById("btnSyncScopeCurrent");
                 if (btnAll && btnCur) {
@@ -2881,6 +3021,9 @@
                 const modal = document.getElementById("liveSyncModal");
                 modal.classList.remove("hidden");
                 modal.classList.add("flex");
+                if (!liveSyncState.isRunning) {
+                    checkServerHealth(true);
+                }
             }
 
             function closeLiveSyncModal() {
@@ -2901,6 +3044,7 @@
                     .classList.toggle("hidden");
             }
 
+            let endpointCheckTimer = null;
             function handleEndpointInputChange() {
                 const val = normalizeApiUrl(
                     document.getElementById("syncEndpointInput").value,
@@ -2920,6 +3064,11 @@
                         }
                     }
                 } catch (e) {}
+
+                LifecycleManager.clearTimeoutSafe(endpointCheckTimer);
+                endpointCheckTimer = LifecycleManager.registerTimeout(
+                    setTimeout(() => checkServerHealth(true), 600),
+                );
             }
 
             function toggleSyncPasswordVisibility() {
@@ -2975,12 +3124,102 @@
                 }
             }
 
-            async function checkServerHealth() {
+            const serverHealthState = {
+                status: "checking", // 'checking' | 'online' | 'offline' | 'unconfigured'
+                latencyMs: null,
+            };
+
+            function renderServerStatusUI(state, latencyMs = null) {
+                serverHealthState.status = state;
+                serverHealthState.latencyMs = latencyMs;
+
+                const hBtn = document.getElementById("headerServerStatusBtn");
+                const hDot = document.getElementById("headerServerDot");
+                const hTxt = document.getElementById("headerServerStatusText");
+
+                const mBadge = document.getElementById("modalServerStatusBadge");
+                const mDot = document.getElementById("modalServerDot");
+                const mTxt = document.getElementById("modalServerStatusText");
+
+                const applyStyles = (container, dot, label, cfg) => {
+                    if (!container || !dot || !label) return;
+                    dot.className = `w-2 h-2 rounded-full shrink-0 ${cfg.dotClass}`;
+                    label.textContent = cfg.text;
+                    container.style.borderColor = cfg.borderColor;
+                    container.style.background = cfg.bgColor;
+                };
+
+                if (state === "checking") {
+                    applyStyles(hBtn, hDot, hTxt, {
+                        dotClass: "bg-amber-400 animate-pulse",
+                        text: "Server: Kiểm tra...",
+                        borderColor: "var(--glass-border)",
+                        bgColor: "var(--chip-bg)",
+                    });
+                    applyStyles(mBadge, mDot, mTxt, {
+                        dotClass: "bg-amber-400 animate-pulse",
+                        text: "Đang kiểm tra server...",
+                        borderColor: "var(--glass-border)",
+                        bgColor: "var(--chip-bg)",
+                    });
+                } else if (state === "online") {
+                    const pingStr = typeof latencyMs === "number" ? ` (${latencyMs}ms)` : "";
+                    applyStyles(hBtn, hDot, hTxt, {
+                        dotClass: "bg-emerald-400",
+                        text: `Server: Hoạt động${pingStr}`,
+                        borderColor: "rgba(16, 185, 129, 0.55)",
+                        bgColor: "rgba(16, 185, 129, 0.14)",
+                    });
+                    applyStyles(mBadge, mDot, mTxt, {
+                        dotClass: "bg-emerald-400",
+                        text: `Server đang hoạt động${pingStr}`,
+                        borderColor: "rgba(16, 185, 129, 0.55)",
+                        bgColor: "rgba(16, 185, 129, 0.14)",
+                    });
+                } else if (state === "unconfigured") {
+                    applyStyles(hBtn, hDot, hTxt, {
+                        dotClass: "bg-amber-400",
+                        text: "Server: Chưa cấu hình",
+                        borderColor: "rgba(245, 158, 11, 0.55)",
+                        bgColor: "rgba(245, 158, 11, 0.14)",
+                    });
+                    applyStyles(mBadge, mDot, mTxt, {
+                        dotClass: "bg-amber-400",
+                        text: "Chưa cấu hình API",
+                        borderColor: "rgba(245, 158, 11, 0.55)",
+                        bgColor: "rgba(245, 158, 11, 0.14)",
+                    });
+                } else {
+                    applyStyles(hBtn, hDot, hTxt, {
+                        dotClass: "bg-rose-500",
+                        text: "Server: Đang tắt",
+                        borderColor: "rgba(244, 63, 94, 0.55)",
+                        bgColor: "rgba(244, 63, 94, 0.14)",
+                    });
+                    applyStyles(mBadge, mDot, mTxt, {
+                        dotClass: "bg-rose-500",
+                        text: "Server đang tắt / tạm dừng",
+                        borderColor: "rgba(244, 63, 94, 0.55)",
+                        bgColor: "rgba(244, 63, 94, 0.14)",
+                    });
+                }
+            }
+
+            async function handleHeaderServerStatusClick() {
+                const isOk = await checkServerHealth(false);
+                if (!isOk) {
+                    openLiveSyncModal();
+                }
+            }
+
+            async function checkServerHealth(silent = false) {
+                renderServerStatusUI("checking");
                 if (serverConfigState.readyPromise) {
                     await serverConfigState.readyPromise;
                 }
                 const base = getApiBaseUrl();
                 if (!base && isStaticHostedPage()) {
+                    renderServerStatusUI("unconfigured");
                     document
                         .getElementById("advancedEndpointBox")
                         .classList.remove("hidden");
@@ -2988,48 +3227,183 @@
                         true,
                         "Chưa cấu hình địa chỉ <code>apiUrl</code> trong tệp <strong>server_config.json</strong> hoặc server đang tắt. Vui lòng cập nhật link tunnel hoặc <strong>liên hệ chủ server</strong>.",
                     );
-                    showToast(
-                        "Chưa có apiUrl trong server_config.json — Hãy kiểm tra cấu hình server.",
-                    );
+                    if (!silent) {
+                        showToast(
+                            "Chưa có apiUrl trong server_config.json — Hãy kiểm tra cấu hình server.",
+                        );
+                    }
                     return false;
                 }
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                const t0 = performance.now();
+
                 try {
-                    const res = await fetch(`${base}/health`, {
+                    const res = await fetch(`${base}/health?_t=${Date.now()}`, {
                         method: "GET",
+                        cache: "no-store",
+                        signal: controller.signal,
                     });
+                    clearTimeout(timeoutId);
                     if (!res.ok) throw new Error(`HTTP ${res.status}`);
                     const data = await res.json();
                     if (data && data.status === "ok") {
+                        const latency = Math.max(1, Math.round(performance.now() - t0));
+                        renderServerStatusUI("online", latency);
                         setServerOfflineAlertVisible(false);
-                        showToast("Kết nối thành công tới Server!");
+                        if (!silent) {
+                            showToast(`🟢 Server đang hoạt động (${latency}ms)!`);
+                        }
                         return true;
                     }
                     throw new Error("Phản hồi không hợp lệ");
                 } catch (e) {
+                    clearTimeout(timeoutId);
+                    renderServerStatusUI("offline");
                     setServerOfflineAlertVisible(true);
-                    showToast(
-                        "Không thể kết nối tới máy chủ (có thể đang tạm dừng hoặc tắt) — Hãy liên hệ chủ server.",
-                    );
+                    if (!silent) {
+                        showToast(
+                            "🔴 Server đang tắt hoặc tạm dừng — Hãy liên hệ chủ server.",
+                        );
+                    }
                     return false;
+                }
+            }
+
+            const TERMINAL_SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+
+            function getTerminalElapsedTag() {
+                if (!liveSyncState.startTimeMs) return "00:00.0s";
+                const elapsedSec = Math.max(0, (Date.now() - liveSyncState.startTimeMs) / 1000);
+                const mins = String(Math.floor(elapsedSec / 60)).padStart(2, "0");
+                const secs = (elapsedSec % 60).toFixed(1).padStart(4, "0");
+                return `${mins}:${secs}s`;
+            }
+
+            function scrollTerminalToBottom() {
+                const vp = document.getElementById("terminalScrollViewport");
+                if (vp) {
+                    vp.scrollTop = vp.scrollHeight;
+                }
+            }
+
+            function resetTerminalOutput(commandText) {
+                liveSyncState.lastLoggedMsg = "";
+                liveSyncState.spinnerFrame = 0;
+                const cmdEl = document.getElementById("terminalCommandLine");
+                if (cmdEl && commandText) cmdEl.textContent = commandText;
+                const stream = document.getElementById("terminalLogStream");
+                if (stream) stream.innerHTML = "";
+                const matrix = document.getElementById("hudWeekMatrix");
+                if (matrix) matrix.innerHTML = "";
+            }
+
+            function appendTerminalLog(level, message, dedupe = true) {
+                const cleanMsg = String(message || "").trim();
+                if (!cleanMsg) return;
+                if (dedupe && liveSyncState.lastLoggedMsg === cleanMsg) return;
+                liveSyncState.lastLoggedMsg = cleanMsg;
+
+                const stream = document.getElementById("terminalLogStream");
+                if (!stream) return;
+
+                const levelMap = {
+                    INFO: { icon: "•", cls: "text-cyan-400" },
+                    AUTH: { icon: "✓", cls: "text-emerald-400" },
+                    META: { icon: "•", cls: "text-indigo-300" },
+                    DONE: { icon: "✓", cls: "text-emerald-400 font-bold" },
+                    WARN: { icon: "!", cls: "text-amber-300 font-bold" },
+                    ERR: { icon: "✕", cls: "text-rose-400 font-bold" },
+                };
+                const meta = levelMap[level] || levelMap.INFO;
+                const ts = getTerminalElapsedTag();
+
+                const row = document.createElement("div");
+                row.className = "flex items-start gap-2 break-words";
+                row.innerHTML = `
+                    <span class="text-slate-500 shrink-0 tabular-nums">[${ts}]</span>
+                    <span class="${meta.cls} shrink-0">${meta.icon}</span>
+                    <span class="text-slate-200">${escapeHtml(cleanMsg)}</span>
+                `;
+                stream.appendChild(row);
+                scrollTerminalToBottom();
+            }
+
+            function copyTerminalOutput() {
+                const vp = document.getElementById("terminalScrollViewport");
+                if (!vp) return;
+                copyTextSafe(vp.innerText.trim()).then(() =>
+                    showToast("Đã sao chép log terminal!"),
+                );
+            }
+
+            function renderProgressVisuals(pctValue) {
+                const clamped = Math.max(0, Math.min(100, Math.round(pctValue)));
+                liveSyncState.percent = clamped;
+
+                const pctEl = document.getElementById("hudPercentText");
+                if (pctEl) {
+                    pctEl.textContent = `${clamped}%`;
+                    if (clamped >= 100) {
+                        pctEl.style.color = "var(--accent-3)";
+                        pctEl.style.background = "rgba(var(--accent-3-rgb), 0.18)";
+                        pctEl.style.borderColor = "rgba(var(--accent-3-rgb), 0.5)";
+                    } else {
+                        pctEl.style.color = "var(--accent-1)";
+                        pctEl.style.background = "rgba(var(--accent-1-rgb), 0.14)";
+                        pctEl.style.borderColor = "rgba(var(--accent-1-rgb), 0.4)";
+                    }
+                }
+
+                const barEl = document.getElementById("hudShimmerBar");
+                if (barEl) barEl.style.width = `${clamped}%`;
+
+                const cntEl = document.getElementById("hudWeekCounterText");
+                if (cntEl) {
+                    cntEl.textContent = `${liveSyncState.completedWeeks}/${liveSyncState.totalWeeks} tuần`;
                 }
             }
 
             function startHudStopwatch() {
                 clearInterval(liveSyncState.timerInterval);
                 liveSyncState.startTimeMs = Date.now();
+                liveSyncState.spinnerFrame = 0;
+                liveSyncState.targetPercent = 1;
+                renderProgressVisuals(1);
+
                 liveSyncState.timerInterval = LifecycleManager.registerInterval(
                     setInterval(() => {
-                        const elapsedSec =
-                            (Date.now() - liveSyncState.startTimeMs) / 1000;
-                        const mins = String(
-                            Math.floor(elapsedSec / 60),
-                        ).padStart(2, "0");
-                        const secs = (elapsedSec % 60)
-                            .toFixed(1)
-                            .padStart(4, "0");
-                        document.getElementById("hudStopwatch").textContent =
-                            `${mins}:${secs}s`;
-                    }, 150),
+                        const timeTag = getTerminalElapsedTag();
+                        const swEl = document.getElementById("hudStopwatch");
+                        if (swEl) swEl.textContent = timeTag;
+
+                        liveSyncState.spinnerFrame =
+                            ((liveSyncState.spinnerFrame || 0) + 1) % TERMINAL_SPINNER_FRAMES.length;
+                        const frameChar = TERMINAL_SPINNER_FRAMES[liveSyncState.spinnerFrame];
+
+                        const activeSpin = document.getElementById("terminalActiveSpinner");
+                        if (activeSpin) activeSpin.textContent = frameChar;
+
+                        const barSpin = document.getElementById("terminalBarSpinner");
+                        if (barSpin && liveSyncState.isRunning) {
+                            barSpin.textContent = frameChar;
+                        }
+
+                        // Chạy mượt từng số 1% -> 100% và nhích nhẹ khi đang chờ phản hồi
+                        if (liveSyncState.isRunning) {
+                            const target = liveSyncState.targetPercent || 1;
+                            if (liveSyncState.percent < target) {
+                                const step = Math.max(1, Math.ceil((target - liveSyncState.percent) / 3));
+                                renderProgressVisuals(Math.min(target, liveSyncState.percent + step));
+                            } else if (liveSyncState.percent < 95) {
+                                const softCap = Math.min(95, Math.max(target + 6, 18));
+                                if (liveSyncState.percent < softCap && liveSyncState.spinnerFrame % 4 === 0) {
+                                    renderProgressVisuals(liveSyncState.percent + 1);
+                                }
+                            }
+                        }
+                    }, 110),
                 );
             }
 
@@ -3041,59 +3415,100 @@
                     );
                     liveSyncState.timerInterval = null;
                 }
+                const barSpin = document.getElementById("terminalBarSpinner");
+                if (barSpin) {
+                    barSpin.textContent = liveSyncState.percent >= 100 ? "✓" : "●";
+                    barSpin.style.color =
+                        liveSyncState.percent >= 100 ? "var(--accent-3)" : "var(--accent-1)";
+                }
             }
 
-            function updateHudProgress(percent, statusMsg) {
-                const clamped = Math.max(0, Math.min(100, Math.round(percent)));
-                liveSyncState.percent = clamped;
-                document.getElementById("hudPercentText").textContent =
-                    `${clamped}%`;
-                document.getElementById("hudShimmerBar").style.width =
-                    `${clamped}%`;
-                document.getElementById(
-                    "hudProgressRing",
-                ).style.strokeDashoffset = String(
-                    251.33 - (clamped / 100) * 251.33,
-                );
-                if (statusMsg)
-                    document.getElementById("hudSubStatusText").textContent =
-                        statusMsg;
-                document.getElementById("hudWeekCounterText").textContent =
-                    `${liveSyncState.completedWeeks}/${liveSyncState.totalWeeks} tuần`;
+            function updateHudProgress(percent, phaseLabel, logMessage = null, logLevel = "INFO") {
+                const clamped = Math.max(1, Math.min(100, Math.round(percent)));
+                liveSyncState.targetPercent = clamped;
+
+                if (clamped >= 100 || !liveSyncState.isRunning) {
+                    renderProgressVisuals(clamped);
+                } else if (clamped > liveSyncState.percent) {
+                    // Nhích ngay lập tức ít nhất 1% để phản hồi tức thì, phần còn lại lướt mượt 1->100%
+                    renderProgressVisuals(Math.max(liveSyncState.percent + 1, Math.min(clamped, liveSyncState.percent + 2)));
+                } else {
+                    renderProgressVisuals(liveSyncState.percent);
+                }
+
+                const subEl = document.getElementById("hudSubStatusText");
+                if (subEl && phaseLabel) subEl.textContent = phaseLabel;
+
+                if (logMessage) {
+                    appendTerminalLog(logLevel, logMessage, true);
+                }
             }
 
             function renderHudWeekMatrix() {
                 const container = document.getElementById("hudWeekMatrix");
-                const count = Math.max(
-                    liveSyncState.totalWeeks,
-                    liveSyncState.weekItems.length,
-                );
-                if (count <= 0) {
+                if (!container) return;
+
+                const items = Array.isArray(liveSyncState.weekItems) ? liveSyncState.weekItems : [];
+                const total = Math.max(liveSyncState.totalWeeks || 0, items.length);
+
+                if (total <= 0 && items.length === 0) {
                     container.innerHTML = "";
                     return;
                 }
-                let html = "";
-                for (let i = 0; i < count; i++) {
-                    const item = liveSyncState.weekItems[i];
-                    if (item) {
-                        const shortLabel =
-                            (item.week || `Tuần ${i + 1}`).match(
-                                /Tuần\s*\d+/i,
-                            )?.[0] || `Tuần ${i + 1}`;
-                        html += `
-            <div class="liquid-chip rounded-xl px-2.5 py-1.5 text-[11px] font-bold" style="border-color: rgba(var(--accent-3-rgb), 0.6);">
-              <span style="color: var(--accent-3);">✓</span> ${escapeHtml(shortLabel)}
-            </div>
-          `;
-                    } else {
-                        html += `
-            <div class="liquid-chip rounded-xl px-2.5 py-1.5 text-[11px] text-muted">
-              Tuần ${i + 1}
-            </div>
-          `;
-                    }
+
+                const padLen = String(Math.max(10, total)).length;
+                const cardsHtml = items
+                    .map((item, idx) => {
+                        const idxStr = String(idx + 1).padStart(padLen, "0");
+                        const semMatch = String(item.semester || "").match(/Học kỳ\s*\d+/i);
+                        const semTag = semMatch ? semMatch[0].replace(/Học kỳ\s*/i, "HK") : "";
+                        const weekShort =
+                            String(item.week || "").match(/Tuần\s*\d+/i)?.[0] ||
+                            String(item.week || `Tuần ${idx + 1}`).trim();
+                        const sessionsText =
+                            typeof item.sessions === "number" ? `${item.sessions} buổi` : "";
+
+                        return `
+                            <div class="term-pkg-chip rounded-lg px-2.5 py-1 flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <span class="font-bold shrink-0" style="color: var(--accent-3);">✓</span>
+                                    <span class="text-slate-500 text-[10px] shrink-0">${idxStr}</span>
+                                    ${semTag ? `<span class="text-cyan-300/90 text-[10px] shrink-0">${escapeHtml(semTag)}</span>` : ""}
+                                    <span class="text-slate-100 truncate">${escapeHtml(weekShort)}</span>
+                                </div>
+                                ${sessionsText ? `<span class="text-[10px] text-slate-400 shrink-0">${escapeHtml(sessionsText)}</span>` : ""}
+                            </div>
+                        `;
+                    })
+                    .join("");
+
+                let activeRowHtml = "";
+                if (liveSyncState.isRunning && (total === 0 || items.length < total)) {
+                    const nextIdx = String(items.length + 1).padStart(padLen, "0");
+                    const totalStr = total > 0 ? String(total).padStart(padLen, "0") : "??";
+                    const spinChar = TERMINAL_SPINNER_FRAMES[liveSyncState.spinnerFrame || 0];
+                    activeRowHtml = `
+                        <div class="rounded-lg px-2.5 py-1.5 flex items-center justify-between gap-2 bg-white/[0.04] border border-white/10">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span id="terminalActiveSpinner" class="font-bold shrink-0" style="color: var(--accent-1);">${spinChar}</span>
+                                <span class="text-slate-300 truncate">Đang tải gói [${nextIdx}/${totalStr}] từ cổng SGU...</span>
+                            </div>
+                            <span class="text-[10px] font-semibold shrink-0" style="color: var(--accent-1);">FETCHING</span>
+                        </div>
+                    `;
                 }
-                container.innerHTML = html;
+
+                container.innerHTML = `
+                    <div class="pt-1.5 border-t border-white/10 flex items-center justify-between text-[10.5px] text-slate-400">
+                        <span>Gói dữ liệu tuần (${items.length}/${total || "?"})</span>
+                        <span>${liveSyncState.isRunning ? "Đang đồng bộ..." : "Hoàn tất"}</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                        ${cardsHtml}
+                    </div>
+                    ${activeRowHtml}
+                `;
+                scrollTerminalToBottom();
             }
 
             function stopActiveSync() {
@@ -3101,10 +3516,17 @@
                     liveSyncState.abortController.abort();
                 liveSyncState.isRunning = false;
                 stopHudStopwatch();
+                renderHudWeekMatrix();
                 document.getElementById("btnStartLiveSync").disabled = false;
                 document.getElementById("btnStopSync").classList.add("hidden");
-                document.getElementById("hudStatusPill").textContent =
-                    "Đã dừng";
+                const pill = document.getElementById("hudStatusPill");
+                if (pill) pill.textContent = "ABORTED";
+                updateHudProgress(
+                    liveSyncState.percent,
+                    "Đã dừng",
+                    "Tiến trình đã bị dừng bởi người dùng.",
+                    "WARN",
+                );
             }
 
             const sleepMs = (ms) =>
@@ -3150,6 +3572,10 @@
                 liveSyncState.weekItems = [];
                 const signal = liveSyncState.abortController.signal;
 
+                resetTerminalOutput(
+                    `sgu-sync --user ${username} --scope ${liveSyncState.scope}`,
+                );
+
                 document.getElementById("btnStartLiveSync").disabled = true;
                 document
                     .getElementById("btnStopSync")
@@ -3161,12 +3587,18 @@
                     .getElementById("hudCompletionBanner")
                     .classList.remove("flex");
                 document.getElementById("hudStatusPill").textContent =
-                    "Đang kết nối...";
-                document.getElementById("hudStudentPill").textContent =
-                    `MSSV: ${username}`;
-                updateHudProgress(5, "Đang gửi yêu cầu lên Server...");
-                renderHudWeekMatrix();
+                    "RUNNING";
                 startHudStopwatch();
+                updateHudProgress(
+                    1,
+                    "Đang kết nối...",
+                    "Đang gửi yêu cầu đồng bộ tới server...",
+                    "INFO",
+                );
+                renderHudWeekMatrix();
+
+                let authLogged = false;
+                let semesterMetaLogged = false;
 
                 try {
                     const startRes = await fetch(`${apiBase}/api/sync-start`, {
@@ -3198,7 +3630,14 @@
                                 "Không khởi tạo được phiên quét.",
                         );
 
+                    renderServerStatusUI("online");
                     const jobId = startData.jobId;
+                    appendTerminalLog(
+                        "INFO",
+                        `Phiên xử lý #${jobId.slice(0, 8)} đã khởi tạo.`,
+                        false,
+                    );
+
                     while (liveSyncState.isRunning) {
                         await sleepMs(650);
                         if (signal.aborted) break;
@@ -3221,11 +3660,28 @@
                         }
                         const job = await statusRes.json();
 
-                        if (job.studentName) {
-                            document.getElementById(
-                                "hudStudentPill",
-                            ).textContent = `${job.studentName} (${username})`;
+                        if (job.studentName && !authLogged) {
+                            authLogged = true;
+                            appendTerminalLog(
+                                "AUTH",
+                                `Xác thực thành công: ${job.studentName}`,
+                                false,
+                            );
                         }
+
+                        if (
+                            typeof job.totalSemesters === "number" &&
+                            job.totalSemesters > 0 &&
+                            !semesterMetaLogged
+                        ) {
+                            semesterMetaLogged = true;
+                            appendTerminalLog(
+                                "META",
+                                `Tìm thấy ${job.totalSemesters} học kỳ trên cổng SGU.`,
+                                false,
+                            );
+                        }
+
                         if (
                             typeof job.totalWeeks === "number" &&
                             job.totalWeeks > 0
@@ -3239,15 +3695,28 @@
                             renderHudWeekMatrix();
                         }
 
+                        const rawMsg = job.message || "Đang xử lý...";
+                        const isWeekScanStep = /Đã quét tuần/i.test(rawMsg);
+                        const shortPhase = isWeekScanStep
+                            ? `Đang tải tuần ${liveSyncState.completedWeeks}/${liveSyncState.totalWeeks || "?"}`
+                            : rawMsg;
+
                         updateHudProgress(
                             job.progress || liveSyncState.percent,
-                            job.message || "Đang xử lý...",
+                            shortPhase,
+                            isWeekScanStep ? null : rawMsg,
+                            "INFO",
                         );
 
-                        if (job.status === "error")
-                            throw new Error(
-                                job.message || "Lỗi đồng bộ từ cổng SGU.",
+                        if (job.status === "error") {
+                            const errObj = new Error(
+                                job.error || job.message || "Lỗi đồng bộ từ cổng SGU.",
                             );
+                            if (job.error_code === "SGU_PORTAL_DOWN") {
+                                errObj.isSguPortalDown = true;
+                            }
+                            throw errObj;
+                        }
 
                         if (job.status === "done" && job.data) {
                             const syncedWeeksTotal =
@@ -3257,11 +3726,14 @@
                                 job.data.totalSemesters ||
                                 (job.data.semesters || []).length ||
                                 1;
+                            liveSyncState.isRunning = false;
                             liveSyncState.totalWeeks = syncedWeeksTotal;
                             liveSyncState.completedWeeks = syncedWeeksTotal;
                             updateHudProgress(
                                 100,
-                                "Hoàn tất đồng bộ thời khóa biểu!",
+                                "Hoàn tất",
+                                `Hoàn tất lưu ${syncedSemsTotal} học kỳ (${syncedWeeksTotal} tuần).`,
+                                "DONE",
                             );
                             renderHudWeekMatrix();
 
@@ -3276,7 +3748,7 @@
 
                             document.getElementById(
                                 "hudStatusPill",
-                            ).textContent = "Hoàn tất 100%";
+                            ).textContent = "DONE";
                             document.getElementById(
                                 "hudCompletionSummary",
                             ).textContent =
@@ -3301,23 +3773,32 @@
                             /failed to fetch|networkerror|load failed|network request failed/i.test(
                                 err.message || "",
                             );
+                        const isSguDown =
+                            err.isSguPortalDown ||
+                            /thongtindaotao\.sgu\.edu\.vn|web trường sgu|cổng đào tạo sgu/i.test(
+                                err.message || "",
+                            );
                         const friendlyMsg = isNetworkOffline
                             ? "Không thể kết nối tới máy chủ (có thể đang tạm dừng hoặc tắt). Muốn bật lại vui lòng liên hệ chủ server."
                             : err.message;
                         if (isNetworkOffline) {
+                            renderServerStatusUI("offline");
                             setServerOfflineAlertVisible(true);
                         }
                         document.getElementById("hudStatusPill").textContent =
-                            isNetworkOffline ? "Server đang tắt" : "Lỗi";
+                            isNetworkOffline ? "OFFLINE" : isSguDown ? "SGU_DOWN" : "ERR";
                         updateHudProgress(
                             liveSyncState.percent,
-                            `❌ ${friendlyMsg}`,
+                            isNetworkOffline ? "Server đang tắt" : isSguDown ? "Web SGU lỗi" : "Thất bại",
+                            friendlyMsg,
+                            isSguDown ? "WARN" : "ERR",
                         );
                         showToast(`❌ ${friendlyMsg}`);
                     }
                 } finally {
                     liveSyncState.isRunning = false;
                     stopHudStopwatch();
+                    renderHudWeekMatrix();
                     document.getElementById("btnStartLiveSync").disabled =
                         false;
                     document
@@ -4625,6 +5106,7 @@
             applyUiScaleToDocument(false);
             applyThemeAndPalette(false);
             loadSavedSyncSettings();
+            checkServerHealth(true);
             loadTimetableFromStorage();
             initOptimizedEventDelegation();
             updateLiveClock();
@@ -4656,9 +5138,19 @@
                 }, 60000),
             );
 
+            LifecycleManager.registerInterval(
+                setInterval(() => {
+                    if (document.hidden || liveSyncState.isRunning) return;
+                    checkServerHealth(true);
+                }, 45000),
+            );
+
             document.addEventListener("visibilitychange", () => {
                 if (!document.hidden) {
                     updateLiveClock();
+                    if (!liveSyncState.isRunning) {
+                        checkServerHealth(true);
+                    }
                     if (appState.semesters.length > 0) {
                         const activeWeeks = getActiveWeeksList();
                         renderTodayHeroSpotlight(
