@@ -649,13 +649,13 @@
             }
         
             /* =========================================================================
-       5. CONSOLE / TERMINAL OUTPUT & THANH TIẾN TRÌNH 1-100%
+       5. CONSOLE / TERMINAL OUTPUT THUẦN VĂN BẢN ([=====] 1% -> 100%)
        ========================================================================= */
             .sgu-terminal-window {
                 background: linear-gradient(
                     180deg,
-                    rgba(10, 15, 29, 0.97) 0%,
-                    rgba(5, 9, 19, 0.99) 100%
+                    rgba(9, 14, 27, 0.98) 0%,
+                    rgba(4, 8, 17, 0.99) 100%
                 );
                 border: 1px solid rgba(var(--accent-1-rgb), 0.36);
                 box-shadow:
@@ -670,47 +670,13 @@
             }
 
             .sgu-terminal-progress-bar-box {
-                background: linear-gradient(
-                    180deg,
-                    rgba(15, 24, 44, 0.94) 0%,
-                    rgba(11, 18, 34, 0.94) 100%
-                );
-                border-bottom: 1px solid rgba(var(--accent-1-rgb), 0.22);
-            }
-
-            .sgu-progress-track {
-                position: relative;
-                background: rgba(255, 255, 255, 0.08);
-                box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
-            }
-
-            .sgu-progress-ticks {
-                position: absolute;
-                inset: 0;
-                background-image: repeating-linear-gradient(
-                    to right,
-                    transparent 0%,
-                    transparent calc(10% - 1px),
-                    rgba(5, 9, 19, 0.45) calc(10% - 1px),
-                    rgba(5, 9, 19, 0.45) 10%
-                );
-                pointer-events: none;
+                background: rgba(11, 18, 34, 0.96);
+                border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
             }
 
             .sgu-terminal-body {
                 scrollbar-width: thin;
                 scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
-            }
-
-            .term-pkg-chip {
-                background: rgba(255, 255, 255, 0.035);
-                border: 1px solid rgba(255, 255, 255, 0.07);
-                transition: background-color 0.15s ease, border-color 0.15s ease;
-            }
-
-            .term-pkg-chip:hover {
-                background: rgba(255, 255, 255, 0.065);
-                border-color: rgba(var(--accent-1-rgb), 0.3);
             }
 
             @keyframes termCursorBlink {
@@ -1529,7 +1495,7 @@
                     </button>
                 </div>
 
-                <!-- Cửa sổ Bash / Console Output với thanh tiến trình 1-100% ghim nổi bật -->
+                <!-- Cửa sổ Bash / Console Output chạy chữ thuần ASCII [=====] 1% -> 100% -->
                 <div
                     class="sgu-terminal-window rounded-2xl overflow-hidden flex flex-col"
                 >
@@ -1574,9 +1540,9 @@
                         </div>
                     </div>
 
-                    <!-- Thanh tiến trình 1% -> 100% luôn hiển thị rõ ngay đầu cửa sổ quét -->
-                    <div class="sgu-terminal-progress-bar-box px-3.5 py-2.5 flex flex-col gap-1.5 font-mono-code">
-                        <div class="flex items-center justify-between gap-2 text-[11px]">
+                    <!-- Dòng tiến trình chữ ASCII thuần túy [=====] 1% -> 100% -->
+                    <div class="sgu-terminal-progress-bar-box px-3.5 py-2.5 flex flex-col gap-1 font-mono-code text-[11px] sm:text-[11.5px]">
+                        <div class="flex items-center justify-between gap-2">
                             <div class="flex items-center gap-1.5 min-w-0">
                                 <span
                                     id="terminalBarSpinner"
@@ -1585,47 +1551,36 @@
                                 >●</span>
                                 <span
                                     id="hudSubStatusText"
-                                    class="text-slate-200 font-medium truncate"
+                                    class="text-slate-300 truncate"
                                 >
                                     Sẵn sàng quét thời khóa biểu
                                 </span>
                             </div>
-
-                            <div class="flex items-center gap-2 shrink-0 tabular-nums">
-                                <span
-                                    id="hudWeekCounterText"
-                                    class="text-[10.5px] text-slate-400"
-                                >0/0 tuần</span>
-                                <span
-                                    id="hudPercentText"
-                                    class="px-2 py-0.5 rounded-md text-xs font-extrabold border"
-                                    style="
-                                        color: var(--accent-1);
-                                        background: rgba(var(--accent-1-rgb), 0.14);
-                                        border-color: rgba(var(--accent-1-rgb), 0.4);
-                                    "
-                                >0%</span>
-                            </div>
+                            <span
+                                id="hudWeekCounterText"
+                                class="text-[10.5px] text-slate-400 tabular-nums shrink-0"
+                            >0/0 tuần</span>
                         </div>
 
-                        <div class="flex items-center gap-2.5">
-                            <span class="text-[10px] text-slate-500 tabular-nums shrink-0">1%</span>
-                            <div class="sgu-progress-track flex-1 h-2.5 rounded-full overflow-hidden">
-                                <div
-                                    id="hudShimmerBar"
-                                    class="shimmer-bar-fill h-full rounded-full"
-                                    style="width: 0%"
-                                ></div>
-                                <div class="sgu-progress-ticks"></div>
-                            </div>
-                            <span class="text-[10px] text-slate-500 tabular-nums shrink-0">100%</span>
+                        <div class="flex items-center gap-1.5 whitespace-pre overflow-x-auto tabular-nums">
+                            <span class="text-slate-400 shrink-0">Tiến trình:</span>
+                            <span
+                                id="hudAsciiTrack"
+                                class="font-bold tracking-tight shrink-0"
+                                style="color: var(--accent-1);"
+                            >[....................]</span>
+                            <span
+                                id="hudPercentText"
+                                class="font-extrabold shrink-0"
+                                style="color: var(--accent-1);"
+                            >  0%</span>
                         </div>
                     </div>
 
-                    <!-- Nội dung Console Output -->
+                    <!-- Nội dung Console Output chạy chữ -->
                     <div
                         id="terminalScrollViewport"
-                        class="sgu-terminal-body p-3.5 max-h-[240px] sm:max-h-[270px] overflow-y-auto font-mono-code text-[11px] leading-relaxed flex flex-col gap-2"
+                        class="sgu-terminal-body p-3.5 max-h-[250px] sm:max-h-[290px] overflow-y-auto font-mono-code text-[11px] sm:text-[11.5px] leading-relaxed flex flex-col gap-1.5"
                     >
                         <!-- Dòng lệnh thực thi -->
                         <div class="flex items-center gap-1.5 text-slate-300">
@@ -1642,8 +1597,8 @@
                             </div>
                         </div>
 
-                        <!-- Danh sách gói tuần đã tải (lưới 2 cột gọn gàng) -->
-                        <div id="hudWeekMatrix" class="flex flex-col gap-1.5"></div>
+                        <!-- Danh sách tiến trình từng tuần chạy chữ trên terminal -->
+                        <div id="hudWeekMatrix" class="flex flex-col gap-0.5"></div>
                     </div>
                 </div>
 
@@ -3338,26 +3293,37 @@
                 );
             }
 
+            function buildAsciiProgressText(pctValue, barWidth = 20) {
+                const clamped = Math.max(0, Math.min(100, Math.round(pctValue)));
+                const filled = Math.round((clamped / 100) * barWidth);
+                const empty = Math.max(0, barWidth - filled);
+                if (filled <= 0) {
+                    return `[${".".repeat(barWidth)}]`;
+                }
+                if (filled >= barWidth || clamped >= 100) {
+                    return `[${"=".repeat(barWidth)}]`;
+                }
+                const eqCount = Math.max(1, filled - 1);
+                return `[${"=".repeat(eqCount)}>${".".repeat(empty)}]`;
+            }
+
             function renderProgressVisuals(pctValue) {
                 const clamped = Math.max(0, Math.min(100, Math.round(pctValue)));
                 liveSyncState.percent = clamped;
 
-                const pctEl = document.getElementById("hudPercentText");
-                if (pctEl) {
-                    pctEl.textContent = `${clamped}%`;
-                    if (clamped >= 100) {
-                        pctEl.style.color = "var(--accent-3)";
-                        pctEl.style.background = "rgba(var(--accent-3-rgb), 0.18)";
-                        pctEl.style.borderColor = "rgba(var(--accent-3-rgb), 0.5)";
-                    } else {
-                        pctEl.style.color = "var(--accent-1)";
-                        pctEl.style.background = "rgba(var(--accent-1-rgb), 0.14)";
-                        pctEl.style.borderColor = "rgba(var(--accent-1-rgb), 0.4)";
-                    }
+                const asciiEl = document.getElementById("hudAsciiTrack");
+                if (asciiEl) {
+                    asciiEl.textContent = buildAsciiProgressText(clamped, 20);
+                    asciiEl.style.color =
+                        clamped >= 100 ? "var(--accent-3)" : "var(--accent-1)";
                 }
 
-                const barEl = document.getElementById("hudShimmerBar");
-                if (barEl) barEl.style.width = `${clamped}%`;
+                const pctEl = document.getElementById("hudPercentText");
+                if (pctEl) {
+                    pctEl.textContent = `${String(clamped).padStart(3, " ")}%`;
+                    pctEl.style.color =
+                        clamped >= 100 ? "var(--accent-3)" : "var(--accent-1)";
+                }
 
                 const cntEl = document.getElementById("hudWeekCounterText");
                 if (cntEl) {
@@ -3365,11 +3331,39 @@
                 }
             }
 
+            function animateProgressSmoothlyTo100(durationMs = 700) {
+                return new Promise((resolve) => {
+                    const startPct = Math.max(1, Math.min(100, Math.round(liveSyncState.percent || 1)));
+                    if (startPct >= 100) {
+                        renderProgressVisuals(100);
+                        resolve();
+                        return;
+                    }
+                    const steps = 100 - startPct;
+                    const intervalMs = Math.max(12, Math.min(28, Math.floor(durationMs / steps)));
+                    let cur = startPct;
+                    const glideId = setInterval(() => {
+                        cur += 1;
+                        renderProgressVisuals(cur);
+                        const activeBarEl = document.getElementById("terminalActiveWeekBar");
+                        const activePctEl = document.getElementById("terminalActiveWeekPct");
+                        if (activeBarEl) activeBarEl.textContent = buildAsciiProgressText(100, 12);
+                        if (activePctEl) activePctEl.textContent = "100%";
+                        if (cur >= 100) {
+                            clearInterval(glideId);
+                            resolve();
+                        }
+                    }, intervalMs);
+                });
+            }
+
             function startHudStopwatch() {
                 clearInterval(liveSyncState.timerInterval);
                 liveSyncState.startTimeMs = Date.now();
                 liveSyncState.spinnerFrame = 0;
                 liveSyncState.targetPercent = 1;
+                liveSyncState.activeWeekSubPct = 1;
+                liveSyncState.lastRenderedWeekCount = -1;
                 renderProgressVisuals(1);
 
                 liveSyncState.timerInterval = LifecycleManager.registerInterval(
@@ -3390,20 +3384,34 @@
                             barSpin.textContent = frameChar;
                         }
 
-                        // Chạy mượt từng số 1% -> 100% và nhích nhẹ khi đang chờ phản hồi
+                        // Chạy chữ tiến trình tuần tự từng số +1% (1% -> 2% -> 3% ... -> 100%)
                         if (liveSyncState.isRunning) {
                             const target = liveSyncState.targetPercent || 1;
                             if (liveSyncState.percent < target) {
-                                const step = Math.max(1, Math.ceil((target - liveSyncState.percent) / 3));
-                                renderProgressVisuals(Math.min(target, liveSyncState.percent + step));
-                            } else if (liveSyncState.percent < 95) {
-                                const softCap = Math.min(95, Math.max(target + 6, 18));
-                                if (liveSyncState.percent < softCap && liveSyncState.spinnerFrame % 4 === 0) {
+                                renderProgressVisuals(liveSyncState.percent + 1);
+                            } else if (liveSyncState.percent < 96) {
+                                const softCap = Math.min(96, Math.max(target + 8, 22));
+                                if (liveSyncState.percent < softCap && liveSyncState.spinnerFrame % 3 === 0) {
                                     renderProgressVisuals(liveSyncState.percent + 1);
                                 }
                             }
+
+                            // Chạy chữ tiến trình 1% -> 99% cho gói tuần hiện tại đang tải
+                            const activeBarEl = document.getElementById("terminalActiveWeekBar");
+                            const activePctEl = document.getElementById("terminalActiveWeekPct");
+                            if (activeBarEl && activePctEl) {
+                                liveSyncState.activeWeekSubPct = Math.min(
+                                    99,
+                                    (liveSyncState.activeWeekSubPct || 1) + 4,
+                                );
+                                activeBarEl.textContent = buildAsciiProgressText(
+                                    liveSyncState.activeWeekSubPct,
+                                    12,
+                                );
+                                activePctEl.textContent = `${String(liveSyncState.activeWeekSubPct).padStart(3, " ")}%`;
+                            }
                         }
-                    }, 110),
+                    }, 65),
                 );
             }
 
@@ -3427,11 +3435,8 @@
                 const clamped = Math.max(1, Math.min(100, Math.round(percent)));
                 liveSyncState.targetPercent = clamped;
 
-                if (clamped >= 100 || !liveSyncState.isRunning) {
+                if (!liveSyncState.isRunning) {
                     renderProgressVisuals(clamped);
-                } else if (clamped > liveSyncState.percent) {
-                    // Nhích ngay lập tức ít nhất 1% để phản hồi tức thì, phần còn lại lướt mượt 1->100%
-                    renderProgressVisuals(Math.max(liveSyncState.percent + 1, Math.min(clamped, liveSyncState.percent + 2)));
                 } else {
                     renderProgressVisuals(liveSyncState.percent);
                 }
@@ -3456,57 +3461,51 @@
                     return;
                 }
 
+                if (liveSyncState.lastRenderedWeekCount !== items.length) {
+                    liveSyncState.lastRenderedWeekCount = items.length;
+                    liveSyncState.activeWeekSubPct = 1;
+                }
+
                 const padLen = String(Math.max(10, total)).length;
-                const cardsHtml = items
+                const fullBar = buildAsciiProgressText(100, 12);
+
+                const linesHtml = items
                     .map((item, idx) => {
                         const idxStr = String(idx + 1).padStart(padLen, "0");
+                        const totalStr = total > 0 ? String(total).padStart(padLen, "0") : "??";
                         const semMatch = String(item.semester || "").match(/Học kỳ\s*\d+/i);
-                        const semTag = semMatch ? semMatch[0].replace(/Học kỳ\s*/i, "HK") : "";
+                        const semTag = semMatch ? semMatch[0].replace(/Học kỳ\s*/i, "HK") : "HK";
                         const weekShort =
                             String(item.week || "").match(/Tuần\s*\d+/i)?.[0] ||
                             String(item.week || `Tuần ${idx + 1}`).trim();
+                        const paddedWeek = weekShort.padEnd(8, " ");
                         const sessionsText =
-                            typeof item.sessions === "number" ? `${item.sessions} buổi` : "";
+                            typeof item.sessions === "number"
+                                ? `(${String(item.sessions).padStart(2, " ")} buổi)`
+                                : "";
 
-                        return `
-                            <div class="term-pkg-chip rounded-lg px-2.5 py-1 flex items-center justify-between gap-2">
-                                <div class="flex items-center gap-1.5 min-w-0">
-                                    <span class="font-bold shrink-0" style="color: var(--accent-3);">✓</span>
-                                    <span class="text-slate-500 text-[10px] shrink-0">${idxStr}</span>
-                                    ${semTag ? `<span class="text-cyan-300/90 text-[10px] shrink-0">${escapeHtml(semTag)}</span>` : ""}
-                                    <span class="text-slate-100 truncate">${escapeHtml(weekShort)}</span>
-                                </div>
-                                ${sessionsText ? `<span class="text-[10px] text-slate-400 shrink-0">${escapeHtml(sessionsText)}</span>` : ""}
-                            </div>
-                        `;
+                        return `<div class="flex items-center justify-between gap-2 py-0.5 whitespace-pre"><div class="flex items-center gap-1.5 min-w-0"><span class="text-emerald-400 font-bold">✓</span><span class="text-slate-500">[${idxStr}/${totalStr}]</span><span class="text-cyan-300">${escapeHtml(semTag)}</span><span class="text-slate-100">${escapeHtml(paddedWeek)}</span></div><div class="flex items-center gap-2 shrink-0 tabular-nums"><span class="text-emerald-400 font-semibold">${fullBar}</span><span class="text-emerald-400 font-bold">100%</span><span class="text-slate-400 text-[10.5px]">${escapeHtml(sessionsText)}</span></div></div>`;
                     })
                     .join("");
 
-                let activeRowHtml = "";
+                let activeLineHtml = "";
                 if (liveSyncState.isRunning && (total === 0 || items.length < total)) {
                     const nextIdx = String(items.length + 1).padStart(padLen, "0");
                     const totalStr = total > 0 ? String(total).padStart(padLen, "0") : "??";
                     const spinChar = TERMINAL_SPINNER_FRAMES[liveSyncState.spinnerFrame || 0];
-                    activeRowHtml = `
-                        <div class="rounded-lg px-2.5 py-1.5 flex items-center justify-between gap-2 bg-white/[0.04] border border-white/10">
-                            <div class="flex items-center gap-2 min-w-0">
-                                <span id="terminalActiveSpinner" class="font-bold shrink-0" style="color: var(--accent-1);">${spinChar}</span>
-                                <span class="text-slate-300 truncate">Đang tải gói [${nextIdx}/${totalStr}] từ cổng SGU...</span>
-                            </div>
-                            <span class="text-[10px] font-semibold shrink-0" style="color: var(--accent-1);">FETCHING</span>
-                        </div>
-                    `;
+                    const curSubPct = liveSyncState.activeWeekSubPct || 1;
+                    const curBar = buildAsciiProgressText(curSubPct, 12);
+                    const pctPad = `${String(curSubPct).padStart(3, " ")}%`;
+
+                    activeLineHtml = `<div class="flex items-center justify-between gap-2 py-0.5 whitespace-pre"><div class="flex items-center gap-1.5 min-w-0"><span id="terminalActiveSpinner" class="font-bold" style="color: var(--accent-1);">${spinChar}</span><span class="text-slate-400">[${nextIdx}/${totalStr}]</span><span class="text-slate-300">Đang quét tuần...</span></div><div class="flex items-center gap-2 shrink-0 tabular-nums"><span id="terminalActiveWeekBar" class="font-semibold" style="color: var(--accent-1);">${curBar}</span><span id="terminalActiveWeekPct" class="font-bold" style="color: var(--accent-1);">${pctPad}</span></div></div>`;
                 }
 
                 container.innerHTML = `
-                    <div class="pt-1.5 border-t border-white/10 flex items-center justify-between text-[10.5px] text-slate-400">
-                        <span>Gói dữ liệu tuần (${items.length}/${total || "?"})</span>
-                        <span>${liveSyncState.isRunning ? "Đang đồng bộ..." : "Hoàn tất"}</span>
+                    <div class="mt-1 pt-1.5 border-t border-dashed border-white/10 text-slate-400 text-[10.5px]">
+                        --- Tiến trình từng tuần (${items.length}/${total || "?"}) ---
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                        ${cardsHtml}
-                    </div>
-                    ${activeRowHtml}
+                    ${linesHtml}
+                    ${activeLineHtml}
                 `;
                 scrollTerminalToBottom();
             }
@@ -3726,9 +3725,11 @@
                                 job.data.totalSemesters ||
                                 (job.data.semesters || []).length ||
                                 1;
-                            liveSyncState.isRunning = false;
                             liveSyncState.totalWeeks = syncedWeeksTotal;
                             liveSyncState.completedWeeks = syncedWeeksTotal;
+                            renderHudWeekMatrix();
+                            await animateProgressSmoothlyTo100(650);
+                            liveSyncState.isRunning = false;
                             updateHudProgress(
                                 100,
                                 "Hoàn tất",
