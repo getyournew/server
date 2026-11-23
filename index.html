@@ -14,7 +14,7 @@
         />
         <meta name="apple-mobile-web-app-title" content="TKB SGU" />
         <meta id="metaThemeColor" name="theme-color" content="#050811" />
-        <title>Thời Khóa Biểu Liquid Glass — SGU</title>
+        <title>Thời Khóa Biểu SGU</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -60,6 +60,9 @@
                 --grid-head-2: rgba(12, 19, 38, 0.88);
                 --card-surface-1: rgba(24, 38, 72, 0.68);
                 --card-surface-2: rgba(11, 18, 36, 0.82);
+                --today-hero-surface: rgba(22, 40, 76, 0.8);
+                --today-card-bright: rgba(30, 54, 98, 0.86);
+                --tomorrow-card-bright: rgba(24, 45, 84, 0.8);
                 --orb-opacity: 0.65;
                 --mesh-line: rgba(255, 255, 255, 0.025);
             }
@@ -89,6 +92,9 @@
                 --grid-head-2: rgba(238, 244, 255, 0.82);
                 --card-surface-1: rgba(255, 255, 255, 0.84);
                 --card-surface-2: rgba(248, 251, 255, 0.82);
+                --today-hero-surface: rgba(255, 255, 255, 0.94);
+                --today-card-bright: rgba(255, 255, 255, 0.97);
+                --tomorrow-card-bright: rgba(248, 252, 255, 0.95);
                 --orb-opacity: 0.5;
                 --mesh-line: rgba(15, 23, 42, 0.032);
             }
@@ -300,17 +306,17 @@
             .liquid-today-hero {
                 background: linear-gradient(
                     135deg,
-                    rgba(var(--accent-3-rgb), 0.18) 0%,
-                    var(--glass-bg-1) 48%,
-                    rgba(var(--accent-1-rgb), 0.18) 100%
+                    rgba(var(--accent-3-rgb), 0.28) 0%,
+                    var(--today-hero-surface) 46%,
+                    rgba(var(--accent-1-rgb), 0.26) 100%
                 );
-                backdrop-filter: blur(22px) saturate(190%);
-                -webkit-backdrop-filter: blur(22px) saturate(190%);
-                border: 1px solid rgba(var(--accent-1-rgb), 0.48);
+                backdrop-filter: blur(22px) saturate(200%);
+                -webkit-backdrop-filter: blur(22px) saturate(200%);
+                border: 1.5px solid rgba(var(--accent-3-rgb), 0.68);
                 box-shadow:
                     0 20px 46px -14px var(--glass-shadow),
-                    0 0 34px -10px rgba(var(--accent-1-rgb), 0.25),
-                    inset 0 1.5px 0 0 var(--glass-specular-top),
+                    0 0 38px -8px rgba(var(--accent-3-rgb), 0.32),
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.42),
                     inset 1px 0 0 0 var(--glass-specular-left);
                 transform: translateZ(0);
             }
@@ -391,46 +397,92 @@
             }
 
             /* =========================================================================
-       4. THẺ TIÊU ĐIỂM HÔM NAY & LƯỚI THỜI KHÓA BIỂU 14 TIẾT X 7 NGÀY
+       4. THẺ TIÊU ĐIỂM HÔM NAY & NGÀY MAI + LƯỚI THỜI KHÓA BIỂU 14 TIẾT X 7 NGÀY
        ========================================================================= */
             .today-pill-card {
                 background: linear-gradient(
                     140deg,
-                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.24) 0%,
-                    var(--card-surface-1) 48%,
-                    rgba(var(--card-hue2-rgb, var(--accent-2-rgb)), 0.2) 100%
+                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.36) 0%,
+                    var(--today-card-bright) 50%,
+                    rgba(var(--card-hue2-rgb, var(--accent-1-rgb)), 0.3) 100%
                 );
-                border: 1px solid
-                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.48);
+                border: 1.25px solid
+                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.68);
                 box-shadow:
-                    0 8px 20px -8px var(--glass-shadow),
-                    inset 0 1px 0 0 var(--glass-specular-top),
-                    inset 3px 0 0 0
-                        rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.88);
+                    0 10px 24px -8px var(--glass-shadow),
+                    0 0 18px -6px rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.34),
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.42),
+                    inset 3.5px 0 0 0
+                        rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.96);
                 contain: layout style paint;
                 transition:
                     transform 0.16s ease,
-                    border-color 0.16s ease;
+                    border-color 0.16s ease,
+                    filter 0.16s ease;
             }
 
             .today-pill-card:hover {
                 transform: translateY(-2px);
+                filter: brightness(1.07);
                 border-color: rgba(
-                    var(--card-hue-rgb, var(--accent-1-rgb)),
-                    0.85
+                    var(--card-hue-rgb, var(--accent-3-rgb)),
+                    0.96
                 );
             }
 
             .today-pill-card.is-live-now {
                 border-width: 1.5px;
-                border-color: rgba(var(--accent-3-rgb), 0.9);
+                border-color: rgba(var(--accent-3-rgb), 0.96);
                 box-shadow:
-                    0 0 24px rgba(var(--accent-3-rgb), 0.28),
-                    inset 0 1px 0 0 var(--glass-specular-top);
+                    0 0 28px rgba(var(--accent-3-rgb), 0.38),
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.48);
             }
 
             .today-pill-card.is-up-next {
-                border-color: rgba(var(--accent-1-rgb), 0.72);
+                border-color: rgba(var(--accent-1-rgb), 0.85);
+            }
+
+            .tomorrow-spotlight-box {
+                background: linear-gradient(
+                    135deg,
+                    rgba(var(--accent-1-rgb), 0.22) 0%,
+                    var(--tomorrow-card-bright) 50%,
+                    rgba(var(--accent-2-rgb), 0.22) 100%
+                );
+                border: 1px solid rgba(var(--accent-1-rgb), 0.54);
+                box-shadow:
+                    inset 0 1px 0 0 rgba(255, 255, 255, 0.34),
+                    0 8px 22px -10px rgba(var(--accent-1-rgb), 0.28);
+            }
+
+            .tomorrow-pill-card {
+                background: linear-gradient(
+                    140deg,
+                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.3) 0%,
+                    var(--tomorrow-card-bright) 52%,
+                    rgba(var(--card-hue2-rgb, var(--accent-2-rgb)), 0.24) 100%
+                );
+                border: 1px solid
+                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.58);
+                box-shadow:
+                    0 6px 18px -6px var(--glass-shadow),
+                    inset 0 1px 0 0 rgba(255, 255, 255, 0.38),
+                    inset 3px 0 0 0
+                        rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.92);
+                contain: layout style paint;
+                transition:
+                    transform 0.16s ease,
+                    border-color 0.16s ease,
+                    filter 0.16s ease;
+            }
+
+            .tomorrow-pill-card:hover {
+                transform: translateY(-2px);
+                filter: brightness(1.07);
+                border-color: rgba(
+                    var(--card-hue-rgb, var(--accent-1-rgb)),
+                    0.94
+                );
             }
 
             .timetable-scroll-viewport {
@@ -483,19 +535,29 @@
             .grid-header-today {
                 background: linear-gradient(
                     180deg,
-                    rgba(var(--accent-3-rgb), 0.34) 0%,
-                    rgba(var(--accent-1-rgb), 0.24) 100%
+                    rgba(var(--accent-3-rgb), 0.48) 0%,
+                    rgba(var(--accent-1-rgb), 0.34) 100%
                 );
-                border-bottom: 1.5px solid rgba(var(--accent-3-rgb), 0.82);
+                border-bottom: 2px solid rgba(var(--accent-3-rgb), 0.92);
+                box-shadow: inset 0 2px 0 0 rgba(255, 255, 255, 0.45);
+            }
+
+            .grid-header-tomorrow:not(.grid-header-today) {
+                background: linear-gradient(
+                    180deg,
+                    rgba(var(--accent-1-rgb), 0.36) 0%,
+                    rgba(var(--accent-2-rgb), 0.24) 100%
+                );
+                border-bottom: 1.5px solid rgba(var(--accent-1-rgb), 0.78);
             }
 
             .grid-header-focused:not(.grid-header-today) {
                 background: linear-gradient(
                     180deg,
-                    rgba(var(--accent-1-rgb), 0.28) 0%,
-                    rgba(var(--accent-2-rgb), 0.22) 100%
+                    rgba(var(--accent-1-rgb), 0.32) 0%,
+                    rgba(var(--accent-2-rgb), 0.26) 100%
                 );
-                box-shadow: inset 0 2px 0 0 rgba(var(--accent-1-rgb), 0.82);
+                box-shadow: inset 0 2px 0 0 rgba(var(--accent-1-rgb), 0.88);
             }
 
             .grid-footer-cell {
@@ -555,11 +617,15 @@
             }
 
             .grid-col-today {
-                background-color: rgba(var(--accent-3-rgb), 0.09);
+                background-color: rgba(var(--accent-3-rgb), 0.15);
+            }
+
+            .grid-col-tomorrow:not(.grid-col-today) {
+                background-color: rgba(var(--accent-1-rgb), 0.085);
             }
 
             .grid-col-focused:not(.grid-col-today) {
-                background-color: rgba(var(--accent-1-rgb), 0.055);
+                background-color: rgba(var(--accent-1-rgb), 0.065);
             }
 
             /* Thẻ môn học kính mờ lưỡng sắc */
@@ -594,12 +660,32 @@
             }
 
             .liquid-card-today {
+                background: linear-gradient(
+                    140deg,
+                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.4) 0%,
+                    var(--today-card-bright) 52%,
+                    rgba(var(--accent-3-rgb), 0.34) 100%
+                ) !important;
                 border-width: 1.5px;
-                border-color: rgba(var(--accent-3-rgb), 0.9);
+                border-color: rgba(var(--accent-3-rgb), 0.95);
                 box-shadow:
-                    0 0 22px rgba(var(--accent-3-rgb), 0.26),
-                    inset 0 1.5px 0 0 var(--glass-specular-top),
-                    inset 3px 0 0 0 rgba(var(--accent-3-rgb), 0.95);
+                    0 0 26px rgba(var(--accent-3-rgb), 0.34),
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.45),
+                    inset 3.5px 0 0 0 rgba(var(--accent-3-rgb), 0.98);
+            }
+
+            .liquid-card-tomorrow {
+                background: linear-gradient(
+                    140deg,
+                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.34) 0%,
+                    var(--tomorrow-card-bright) 52%,
+                    rgba(var(--card-hue2-rgb, var(--accent-2-rgb)), 0.28) 100%
+                );
+                border-color: rgba(var(--accent-1-rgb), 0.8);
+                box-shadow:
+                    0 8px 20px -6px var(--glass-shadow),
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.36),
+                    inset 3px 0 0 0 rgba(var(--accent-1-rgb), 0.92);
             }
 
             .liquid-card-selected {
@@ -750,10 +836,23 @@
                         <div class="min-w-0">
                             <div class="flex flex-wrap items-center gap-2">
                                 <h1
+                                    id="mainAppTitle"
                                     class="text-base sm:text-lg font-extrabold tracking-tight prismatic-title"
                                 >
-                                    Thời Khóa Biểu Liquid Glass
+                                    Thời Khóa Biểu SGU
                                 </h1>
+                                <span
+                                    id="appVersionBadge"
+                                    class="liquid-chip px-2.5 py-0.5 rounded-full text-[10.5px] font-mono-code font-bold"
+                                    style="
+                                        color: var(--accent-1);
+                                        border-color: rgba(var(--accent-1-rgb), 0.45);
+                                        background: rgba(var(--accent-1-rgb), 0.14);
+                                    "
+                                    title="Phiên bản cập nhật ứng dụng"
+                                >
+                                    v001.002.000
+                                </span>
                                 <span
                                     id="semesterBadge"
                                     class="liquid-chip px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-sub"
@@ -807,7 +906,7 @@
                             id="btnColorStudioToggle"
                             onclick="toggleColorPopover(event)"
                             class="liquid-chip px-3.5 py-2 rounded-full text-xs font-semibold text-main flex items-center gap-1.5 cursor-pointer"
-                            title="Tùy chỉnh bảng màu Liquid Glass và tỷ lệ hiển thị UI Scale"
+                            title="Tùy chỉnh bảng màu giao diện SGU và tỷ lệ hiển thị UI Scale"
                         >
                             <span
                                 class="w-3.5 h-3.5 rounded-full border border-white/60 shrink-0"
@@ -1044,7 +1143,7 @@
                     >Chạm thẻ môn học để chọn / hủy chọn • Vuốt ngang để xem các
                     thứ trong tuần</span
                 >
-                <span>Liquid Glass UI • Lưu cục bộ tối ưu bộ nhớ</span>
+                <span id="footerAppVersionText">Thời Khóa Biểu SGU • v001.002.000 • Lưu cục bộ tối ưu bộ nhớ</span>
             </footer>
         </main>
 
@@ -1059,7 +1158,7 @@
         >
             <div class="flex items-center justify-between">
                 <span class="text-xs font-extrabold text-main"
-                    >Tùy chỉnh Liquid Glass</span
+                    >Tùy chỉnh giao diện SGU</span
                 >
                 <button
                     type="button"
@@ -1843,6 +1942,7 @@
                 "139, 92, 246",
                 "244, 63, 94",
             ];
+            const APP_VERSION = "001.002.000";
             const STORAGE_KEY = "sgu_liquid_timetable_v4";
             const LEGACY_STORAGE_KEY_V3 = "sgu_liquid_timetable_v3";
             const CREDS_STORAGE_KEY = "sgu_colab_creds_v1";
@@ -4409,9 +4509,23 @@
                     ? mergeConsecutiveCoursesForDisplay(activeWeek.courses)
                     : [];
 
+                const displayTitle = appState.studentName
+                    ? `Thời Khóa Biểu SGU — ${appState.studentName}`
+                    : "Thời Khóa Biểu SGU";
+                const titleEl = document.getElementById("mainAppTitle");
+                if (titleEl) titleEl.textContent = displayTitle;
+                document.title = `${displayTitle} (v${APP_VERSION})`;
+
+                const verBadgeEl = document.getElementById("appVersionBadge");
+                if (verBadgeEl) verBadgeEl.textContent = `v${APP_VERSION}`;
+                const footerVerEl = document.getElementById("footerAppVersionText");
+                if (footerVerEl) {
+                    footerVerEl.textContent = `Thời Khóa Biểu SGU • v${APP_VERSION} • Lưu cục bộ tối ưu bộ nhớ`;
+                }
+
                 document.getElementById("semesterBadge").textContent =
                     totalSemesters > 0 && activeSem
-                        ? `${appState.studentName ? appState.studentName + " • " : ""}${activeSem.semester}`
+                        ? activeSem.semester
                         : DEFAULT_EMPTY_SEMESTER;
 
                 document.getElementById("weekSubtitle").textContent = activeWeek
@@ -4604,6 +4718,83 @@
                 }
             }
 
+            function getTomorrowScheduleContext(activeWeek, allMergedWeekCourses) {
+                const todayIdx = getTodayDayIndex();
+                const tomorrowIdx = (todayIdx + 1) % 7;
+                const activeWeeks = getActiveWeeksList();
+
+                // Nếu hôm nay là Chủ Nhật (index 6) và có tuần kế tiếp trong cùng học kỳ thì lấy Thứ 2 tuần sau
+                if (todayIdx === 6 && appState.currentWeekIndex + 1 < activeWeeks.length) {
+                    const nextWeekObj = activeWeeks[appState.currentWeekIndex + 1];
+                    const nextWeekMerged = mergeConsecutiveCoursesForDisplay(
+                        nextWeekObj.courses || [],
+                    );
+                    const tomorrowCourses = nextWeekMerged.filter(
+                        (c) => c.dayIndex === 0,
+                    );
+                    const dayLabel =
+                        (nextWeekObj.days && nextWeekObj.days[0]) ||
+                        BASE_DAYS[0].label;
+                    return {
+                        tomorrowIdx: 0,
+                        dayLabel: `${dayLabel} (tuần kế)`,
+                        courses: tomorrowCourses,
+                        isNextWeek: true,
+                    };
+                }
+
+                const tomorrowCourses = allMergedWeekCourses.filter(
+                    (c) => c.dayIndex === tomorrowIdx,
+                );
+                const dayLabel =
+                    (activeWeek.days && activeWeek.days[tomorrowIdx]) ||
+                    BASE_DAYS[tomorrowIdx].label;
+                return {
+                    tomorrowIdx,
+                    dayLabel,
+                    courses: tomorrowCourses,
+                    isNextWeek: false,
+                };
+            }
+
+            function goToTomorrow() {
+                const todayIdx = getTodayDayIndex();
+                const tomorrowIdx = (todayIdx + 1) % 7;
+                if (appState.semesters.length > 0) {
+                    const targetPos = findCurrentSemesterAndWeekIndex(
+                        appState.semesters,
+                    );
+                    let targetSemIdx = targetPos.semIdx;
+                    let targetWeekIdx = targetPos.weekIdx;
+                    const semWeeks =
+                        (appState.semesters[targetSemIdx] &&
+                            appState.semesters[targetSemIdx].weeks) ||
+                        [];
+                    if (todayIdx === 6 && targetWeekIdx + 1 < semWeeks.length) {
+                        targetWeekIdx += 1;
+                    }
+                    if (
+                        targetSemIdx !== appState.currentSemesterIndex ||
+                        targetWeekIdx !== appState.currentWeekIndex
+                    ) {
+                        appState.currentSemesterIndex = targetSemIdx;
+                        appState.currentWeekIndex = targetWeekIdx;
+                        appState.focusedDayIndex = tomorrowIdx;
+                        saveTimetableToStorage();
+                        renderAll();
+                        scrollGridToFocusedDay(tomorrowIdx);
+                        showToast(
+                            `Đã chuyển sang ${BASE_DAYS[tomorrowIdx].label} (Ngày mai).`,
+                        );
+                        return;
+                    }
+                }
+                setFocusedDay(tomorrowIdx, true);
+                showToast(
+                    `Đã chuyển sang ${BASE_DAYS[tomorrowIdx].label} (Ngày mai).`,
+                );
+            }
+
             function renderTodayHeroSpotlight(activeWeek) {
                 const hero = document.getElementById("todayHeroSpotlight");
                 if (!activeWeek) {
@@ -4614,8 +4805,10 @@
 
                 hero.classList.remove("hidden");
                 const todayIdx = getTodayDayIndex();
+                const tomorrowIdx = (todayIdx + 1) % 7;
                 const focusIdx = appState.focusedDayIndex;
                 const isActualToday = focusIdx === todayIdx;
+                const isActualTomorrow = focusIdx === tomorrowIdx;
                 const dayLabel =
                     (activeWeek.days && activeWeek.days[focusIdx]) ||
                     BASE_DAYS[focusIdx].label;
@@ -4642,43 +4835,38 @@
                           ].endTime
                         : null;
 
-                let smartHintHtml = "";
-                if (isActualToday && dayCourses.length > 0) {
-                    const allFinished = dayCourses.every(
-                        (c) => getCourseLiveStatus(c).state === "done",
-                    );
-                    if (allFinished) {
-                        const tomorrowIdx = (todayIdx + 1) % 7;
-                        const tomorrowCourses = allMergedWeekCourses.filter(
-                            (c) => c.dayIndex === tomorrowIdx,
-                        );
-                        smartHintHtml =
-                            tomorrowCourses.length > 0
-                                ? `<span class="liquid-chip px-2.5 py-0.5 rounded-full text-[11px] font-medium text-sub">✨ Ngày mai (${BASE_DAYS[tomorrowIdx].label}): ${tomorrowCourses.length} môn (bắt đầu ${PERIODS[tomorrowCourses[0].startPeriod - 1].startTime})</span>`
-                                : `<span class="liquid-chip px-2.5 py-0.5 rounded-full text-[11px] font-medium text-sub">✨ Ngày mai (${BASE_DAYS[tomorrowIdx].label}): Nghỉ trọn ngày</span>`;
-                    }
-                }
-
                 const dayTabsHtml = BASE_DAYS.map((d) => {
                     const count = allMergedWeekCourses.filter(
                         (c) => c.dayIndex === d.index,
                     ).length;
                     const isD = d.index === focusIdx;
                     const isT = d.index === todayIdx;
+                    const isTm = d.index === tomorrowIdx;
+                    const tabTitle = isT
+                        ? "✦ Hôm nay"
+                        : isTm
+                          ? "▸ Ngày mai"
+                          : d.label;
+                    let tabStyle = "";
+                    if (isD) {
+                        tabStyle = isT
+                            ? "border-color: rgba(var(--accent-3-rgb), 0.95); background: rgba(var(--accent-3-rgb), 0.28);"
+                            : "border-color: rgba(var(--accent-1-rgb), 0.95); background: rgba(var(--accent-1-rgb), 0.26);";
+                    } else if (isT) {
+                        tabStyle =
+                            "border-color: rgba(var(--accent-3-rgb), 0.65); background: rgba(var(--accent-3-rgb), 0.14);";
+                    } else if (isTm) {
+                        tabStyle =
+                            "border-color: rgba(var(--accent-1-rgb), 0.55); background: rgba(var(--accent-1-rgb), 0.12);";
+                    }
                     return `
           <button
             type="button"
             data-focus-day="${d.index}"
             class="liquid-chip shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold flex items-center gap-1.5 cursor-pointer"
-            style="${
-                isD
-                    ? isT
-                        ? "border-color: rgba(var(--accent-3-rgb), 0.9); background: rgba(var(--accent-3-rgb), 0.22);"
-                        : "border-color: rgba(var(--accent-1-rgb), 0.9); background: rgba(var(--accent-1-rgb), 0.2);"
-                    : ""
-            }"
+            style="${tabStyle}"
           >
-            <span class="text-main">${isT ? "✦ Hôm nay" : d.label}</span>
+            <span class="text-main">${tabTitle}</span>
             <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono-code text-sub">${count}</span>
           </button>
         `;
@@ -4687,9 +4875,9 @@
                 let cardsHtml = "";
                 if (dayCourses.length === 0) {
                     cardsHtml = `
-          <div class="liquid-chip rounded-2xl px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="liquid-chip rounded-2xl px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3" style="background: var(--today-card-bright);">
             <div class="text-xs sm:text-sm font-semibold text-main">
-              ${isActualToday ? "🌿 Hôm nay bạn không có lịch học trên trường." : `🌿 Không có lịch học vào ${BASE_DAYS[focusIdx].label}.`}
+              ${isActualToday ? "🌿 Hôm nay bạn không có lịch học trên trường." : isActualTomorrow ? "🌿 Ngày mai bạn không có lịch học trên trường." : `🌿 Không có lịch học vào ${BASE_DAYS[focusIdx].label}.`}
             </div>
             ${
                 !isActualToday
@@ -4723,15 +4911,15 @@
                       <div class="flex items-center justify-between gap-2">
                         <span
                           class="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono-code font-bold text-main border"
-                          style="background: rgba(${huePair.primary}, 0.24); border-color: rgba(${huePair.primary}, 0.55);"
+                          style="background: rgba(${huePair.primary}, 0.34); border-color: rgba(${huePair.primary}, 0.72);"
                         >
                           ${liveInfo ? liveInfo.label : `Tiết ${c.startPeriod} → ${c.endPeriod}`}
                         </span>
-                        <span class="font-mono-code text-[11px] font-semibold text-sub">
+                        <span class="font-mono-code text-[11px] font-bold text-main">
                           ${PERIODS[c.startPeriod - 1].startTime} – ${PERIODS[c.endPeriod - 1].endTime}
                         </span>
                       </div>
-                      <div class="font-bold text-main text-sm leading-snug line-clamp-2">
+                      <div class="font-extrabold text-main text-sm leading-snug line-clamp-2">
                         ${escapeHtml(c.name)}
                       </div>
                     </div>
@@ -4744,7 +4932,7 @@
 
                     <div class="flex flex-wrap items-center justify-between gap-2 pt-2 text-[11px] font-mono-code text-sub" style="border-top: 1px solid var(--grid-line);">
                       <span>Tiết ${c.startPeriod}–${c.endPeriod}</span>
-                      ${c.room ? `<span class="font-semibold text-main">📍 ${escapeHtml(c.room)}</span>` : ""}
+                      ${c.room ? `<span class="font-bold text-main">📍 ${escapeHtml(c.room)}</span>` : ""}
                       ${c.lecturer ? `<span class="truncate max-w-[140px]">👤 ${escapeHtml(c.lecturer)}</span>` : ""}
                     </div>
                   </div>
@@ -4755,23 +4943,130 @@
         `;
                 }
 
+                // Khối hiển thị lịch Ngày mai sáng rõ ngay bên dưới Hôm nay
+                let tomorrowSectionHtml = "";
+                if (isActualToday) {
+                    const tmCtx = getTomorrowScheduleContext(
+                        activeWeek,
+                        allMergedWeekCourses,
+                    );
+                    const tmTotalPeriods = tmCtx.courses.reduce(
+                        (sum, c) => sum + (c.endPeriod - c.startPeriod + 1),
+                        0,
+                    );
+                    const tmFirstStart =
+                        tmCtx.courses.length > 0
+                            ? PERIODS[tmCtx.courses[0].startPeriod - 1].startTime
+                            : null;
+                    const tmLastEnd =
+                        tmCtx.courses.length > 0
+                            ? PERIODS[
+                                  tmCtx.courses[tmCtx.courses.length - 1]
+                                      .endPeriod - 1
+                              ].endTime
+                            : null;
+
+                    const tmCardsHtml =
+                        tmCtx.courses.length === 0
+                            ? `
+                        <div class="text-xs font-semibold text-main py-1">
+                          🌿 Ngày mai (${escapeHtml(tmCtx.dayLabel)}) bạn không có lịch học trên trường.
+                        </div>
+                      `
+                            : `
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2.5">
+                          ${tmCtx.courses
+                              .map((c) => {
+                                  const huePair = getSubjectHuePair(c.name);
+                                  const clickAttr = tmCtx.isNextWeek
+                                      ? `onclick="goToTomorrow()"`
+                                      : `data-focus-course="${escapeHtml(c.id)}"`;
+                                  return `
+                                <div
+                                  ${clickAttr}
+                                  class="tomorrow-pill-card rounded-2xl p-3 flex flex-col justify-between gap-1.5 cursor-pointer"
+                                  style="--card-hue-rgb: ${huePair.primary}; --card-hue2-rgb: ${huePair.secondary};"
+                                >
+                                  <div class="flex items-center justify-between gap-2">
+                                    <span
+                                      class="px-2 py-0.5 rounded-full text-[10px] font-mono-code font-bold text-main border"
+                                      style="background: rgba(${huePair.primary}, 0.3); border-color: rgba(${huePair.primary}, 0.65);"
+                                    >
+                                      Tiết ${c.startPeriod} → ${c.endPeriod}
+                                    </span>
+                                    <span class="font-mono-code text-[11px] font-bold text-main">
+                                      ${PERIODS[c.startPeriod - 1].startTime} – ${PERIODS[c.endPeriod - 1].endTime}
+                                    </span>
+                                  </div>
+                                  <div class="font-bold text-main text-xs sm:text-[13px] leading-snug line-clamp-2">
+                                    ${escapeHtml(c.name)}
+                                  </div>
+                                  <div class="flex flex-wrap items-center justify-between gap-2 pt-1.5 text-[10.5px] font-mono-code text-sub" style="border-top: 1px solid var(--grid-line);">
+                                    ${c.room ? `<span class="font-bold text-main">📍 ${escapeHtml(c.room)}</span>` : `<span>Tiết ${c.startPeriod}–${c.endPeriod}</span>`}
+                                    ${c.lecturer ? `<span class="truncate max-w-[150px]">👤 ${escapeHtml(c.lecturer)}</span>` : ""}
+                                  </div>
+                                </div>
+                              `;
+                              })
+                              .join("")}
+                        </div>
+                      `;
+
+                    tomorrowSectionHtml = `
+            <div class="tomorrow-spotlight-box rounded-2xl p-3.5 flex flex-col gap-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span
+                    class="px-2.5 py-0.5 rounded-full text-[10.5px] font-extrabold uppercase tracking-wider text-main border"
+                    style="background: rgba(var(--accent-1-rgb), 0.28); border-color: rgba(var(--accent-1-rgb), 0.68);"
+                  >
+                    ▸ Lịch Ngày mai
+                  </span>
+                  <h3 class="text-xs sm:text-sm font-extrabold text-main">${escapeHtml(tmCtx.dayLabel)}</h3>
+                  ${
+                      tmCtx.courses.length > 0
+                          ? `<span class="liquid-chip px-2.5 py-0.5 rounded-full text-[10.5px] font-mono-code text-main font-semibold">${tmCtx.courses.length} môn • ${tmTotalPeriods} tiết (${tmFirstStart} → ${tmLastEnd})</span>`
+                          : ""
+                  }
+                </div>
+                <button
+                  type="button"
+                  onclick="goToTomorrow()"
+                  class="liquid-chip px-3 py-1 rounded-full text-[11px] font-bold text-main cursor-pointer"
+                >
+                  Xem cột Ngày mai →
+                </button>
+              </div>
+              ${tmCardsHtml}
+            </div>
+          `;
+                }
+
+                const badgeText = isActualToday
+                    ? "✦ Tiêu điểm Hôm nay"
+                    : isActualTomorrow
+                      ? "▸ Tiêu điểm Ngày mai"
+                      : "● Đang xem ngày";
+                const badgeStyle = isActualToday
+                    ? "background: rgba(var(--accent-3-rgb), 0.32); border-color: rgba(var(--accent-3-rgb), 0.72);"
+                    : "background: rgba(var(--accent-1-rgb), 0.28); border-color: rgba(var(--accent-1-rgb), 0.68);";
+
                 const heroHtml = `
         <div class="flex flex-col gap-3">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2.5">
             <div class="flex flex-wrap items-center gap-2">
               <span
                 class="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider text-main border"
-                style="background: rgba(var(--accent-3-rgb), 0.22); border-color: rgba(var(--accent-3-rgb), 0.55);"
+                style="${badgeStyle}"
               >
-                ${isActualToday ? "✦ Tiêu điểm Hôm nay" : "● Đang xem ngày"}
+                ${badgeText}
               </span>
               <h2 class="text-sm sm:text-base font-extrabold text-main">${escapeHtml(dayLabel)}</h2>
               ${
                   dayCourses.length > 0
-                      ? `<span class="liquid-chip px-2.5 py-0.5 rounded-full text-[11px] font-mono-code text-sub">${dayCourses.length} môn • ${totalPeriods} tiết (${firstStart} → ${lastEnd})</span>`
+                      ? `<span class="liquid-chip px-2.5 py-0.5 rounded-full text-[11px] font-mono-code font-semibold text-main">${dayCourses.length} môn • ${totalPeriods} tiết (${firstStart} → ${lastEnd})</span>`
                       : ""
               }
-              ${smartHintHtml}
             </div>
 
             <div class="mobile-scroll-strip flex items-center gap-1.5 pb-0.5">
@@ -4780,6 +5075,7 @@
           </div>
 
           ${cardsHtml}
+          ${tomorrowSectionHtml}
         </div>
       `;
 
@@ -4848,6 +5144,7 @@
             function renderTimetableGrid(activeWeek, mergedCourses) {
                 const grid = document.getElementById("timetableGrid");
                 const todayIdx = getTodayDayIndex();
+                const tomorrowIdx = (todayIdx + 1) % 7;
                 const focusIdx = appState.focusedDayIndex;
                 const currentPeriod = getCurrentPeriodNumber();
                 const displayCourses =
@@ -4869,6 +5166,7 @@
                 // Tiêu đề 7 ngày
                 for (let d = 0; d < 7; d++) {
                     const isToday = d === todayIdx;
+                    const isTomorrow = d === tomorrowIdx && !isToday;
                     const isFocused = d === focusIdx && !isToday;
                     const dayText =
                         (activeWeek.days && activeWeek.days[d]) ||
@@ -4877,14 +5175,16 @@
                     html += `
           <div
             data-day-header="${d}"
-            class="grid-header-cell ${isToday ? "grid-header-today" : ""} ${isFocused ? "grid-header-focused" : ""} px-2 py-2.5 flex flex-col items-center justify-center cursor-pointer text-center"
+            class="grid-header-cell ${isToday ? "grid-header-today" : ""} ${isTomorrow ? "grid-header-tomorrow" : ""} ${isFocused ? "grid-header-focused" : ""} px-2 py-2.5 flex flex-col items-center justify-center cursor-pointer text-center"
             style="grid-row: 1; grid-column: ${d + 2}; --day-hue-rgb: ${dayHue};"
           >
             <span class="font-bold text-main">${escapeHtml(dayText)}</span>
             ${
                 isToday
-                    ? '<span class="px-2 py-0.2 rounded-full text-[9.5px] font-mono-code font-bold text-main mt-0.5" style="background: rgba(var(--accent-3-rgb), 0.3);">● HÔM NAY</span>'
-                    : ""
+                    ? '<span class="px-2 py-0.2 rounded-full text-[9.5px] font-mono-code font-bold text-main mt-0.5" style="background: rgba(var(--accent-3-rgb), 0.42);">● HÔM NAY</span>'
+                    : isTomorrow
+                      ? '<span class="px-2 py-0.2 rounded-full text-[9.5px] font-mono-code font-bold text-main mt-0.5" style="background: rgba(var(--accent-1-rgb), 0.32);">▸ NGÀY MAI</span>'
+                      : ""
             }
           </div>
         `;
@@ -4918,11 +5218,12 @@
 
                     for (let d = 0; d < 7; d++) {
                         const isColToday = d === todayIdx;
+                        const isColTomorrow = d === tomorrowIdx && !isColToday;
                         const isColFocused = d === focusIdx && !isColToday;
                         html += `
             <div
               data-day-col="${d}"
-              class="grid-empty-slot ${isColToday ? "grid-col-today" : ""} ${isColFocused ? "grid-col-focused" : ""}"
+              class="grid-empty-slot ${isColToday ? "grid-col-today" : ""} ${isColTomorrow ? "grid-col-tomorrow" : ""} ${isColFocused ? "grid-col-focused" : ""}"
               style="grid-row: ${rowNum}; grid-column: ${d + 2};"
             ></div>
           `;
@@ -4976,6 +5277,7 @@
                     const rowEnd = c.endPeriod + 2;
                     const colNum = c.dayIndex + 2;
                     const isTodayCard = c.dayIndex === todayIdx;
+                    const isTomorrowCard = c.dayIndex === tomorrowIdx && !isTodayCard;
                     const isSelected = isMergedCourseSelected(c);
                     const liveInfo = isTodayCard
                         ? getCourseLiveStatus(c)
@@ -5005,7 +5307,7 @@
           <div
             data-course-id="${escapeHtml(c.id)}"
             data-course-ids="${escapeHtml(encodedIds)}"
-            class="liquid-course-card ${isTodayCard ? "liquid-card-today" : ""} ${isSelected ? "liquid-card-selected" : ""} rounded-2xl p-2.5 flex flex-col justify-between gap-1.5 cursor-pointer overflow-hidden"
+            class="liquid-course-card ${isTodayCard ? "liquid-card-today" : ""} ${isTomorrowCard ? "liquid-card-tomorrow" : ""} ${isSelected ? "liquid-card-selected" : ""} rounded-2xl p-2.5 flex flex-col justify-between gap-1.5 cursor-pointer overflow-hidden"
             style="grid-row: ${rowStart} / ${rowEnd}; grid-column: ${colNum}; --card-hue-rgb: ${huePair.primary}; --card-hue2-rgb: ${huePair.secondary}; ${subColStyle}"
           >
             <div class="flex flex-col gap-1">
