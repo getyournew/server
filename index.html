@@ -1191,6 +1191,52 @@
                 </button>
             </div>
 
+            <!-- Khu vực cân bằng Light (0%) <-> Dark (100%) -->
+            <div class="liquid-chip rounded-2xl p-3 flex flex-col gap-2">
+                <div class="flex items-center justify-between gap-2">
+                    <span class="text-[11px] font-bold text-main"
+                        >Cân bằng Light / Dark</span
+                    >
+                    <span
+                        id="lightDarkBalanceBadge"
+                        class="px-2 py-0.5 rounded-full text-[10px] font-mono-code font-bold text-main"
+                        style="background: rgba(var(--accent-2-rgb), 0.22)"
+                    >
+                        100% Dark
+                    </span>
+                </div>
+                <div class="flex items-center justify-between gap-2 text-[10.5px] font-mono-code font-bold">
+                    <button
+                        type="button"
+                        onclick="setLightDarkBalance(0)"
+                        class="text-sub hover:text-main cursor-pointer shrink-0"
+                        title="0% Dark = 100% Light"
+                    >
+                        Light 0
+                    </button>
+                    <input
+                        type="range"
+                        id="lightDarkBalanceSlider"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value="100"
+                        oninput="setLightDarkBalance(Number(this.value))"
+                        aria-label="Mức độ Light 0 đến 100 Dark"
+                        class="w-full cursor-pointer"
+                        style="accent-color: var(--accent-2)"
+                    />
+                    <button
+                        type="button"
+                        onclick="setLightDarkBalance(100)"
+                        class="text-sub hover:text-main cursor-pointer shrink-0"
+                        title="100% Dark"
+                    >
+                        100 Dark
+                    </button>
+                </div>
+            </div>
+
             <!-- Khu vực Auto UI Scale (50% - 125%) -->
             <div class="liquid-chip rounded-2xl p-3 flex flex-col gap-2">
                 <div class="flex items-center justify-between gap-2">
@@ -2019,6 +2065,7 @@
                 lastHeroHtml: "",
                 lastGridHtml: "",
                 theme: "dark",
+                darkBalance: 100,
                 presetId: "aurora",
                 customColor1: "#06b6d4",
                 customColor2: "#6366f1",
@@ -2193,6 +2240,7 @@
                         UI_PREFS_KEY,
                         JSON.stringify({
                             theme: appState.theme,
+                            darkBalance: appState.darkBalance,
                             presetId: appState.presetId,
                             customColor1: appState.customColor1,
                             customColor2: appState.customColor2,
@@ -2212,6 +2260,13 @@
                     if (p && typeof p === "object") {
                         if (p.theme === "light" || p.theme === "dark")
                             appState.theme = p.theme;
+                        if (typeof p.darkBalance === "number" && !Number.isNaN(p.darkBalance)) {
+                            appState.darkBalance = Math.max(0, Math.min(100, Math.round(p.darkBalance)));
+                        } else if (p.theme === "light") {
+                            appState.darkBalance = 0;
+                        } else if (p.theme === "dark") {
+                            appState.darkBalance = 100;
+                        }
                         if (p.presetId) appState.presetId = p.presetId;
                         if (p.customColor1)
                             appState.customColor1 = sanitizeHexColor(p.customColor1, "#06b6d4");
@@ -2235,25 +2290,120 @@
                 } catch (e) {}
             }
 
+            function interpolateHex(hexLight, hexDark, darkRatio) {
+                const lHex = sanitizeHexColor(hexLight, "#ffffff");
+                const dHex = sanitizeHexColor(hexDark, "#050811");
+                const t = Math.max(0, Math.min(1, darkRatio));
+                const lr = parseInt(lHex.slice(1, 3), 16), lg = parseInt(lHex.slice(3, 5), 16), lb = parseInt(lHex.slice(5, 7), 16);
+                const dr = parseInt(dHex.slice(1, 3), 16), dg = parseInt(dHex.slice(3, 5), 16), db = parseInt(dHex.slice(5, 7), 16);
+                const r = Math.round(lr + (dr - lr) * t);
+                const g = Math.round(lg + (dg - lg) * t);
+                const b = Math.round(lb + (db - lb) * t);
+                return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+            }
+
+            function lerpNum(a, b, t) {
+                return a + (b - a) * Math.max(0, Math.min(1, t));
+            }
+
+            function interpolateRgba(lightStr, darkStr, t) {
+                const parse = (s) => s.match(/[\d.]+/g).map(Number);
+                const [lr, lg, lb, la = 1] = parse(lightStr);
+                const [dr, dg, db, da = 1] = parse(darkStr);
+                const r = Math.round(lerpNum(lr, dr, t));
+                const g = Math.round(lerpNum(lg, dg, t));
+                const b = Math.round(lerpNum(lb, db, t));
+                const a = Number(lerpNum(la, da, t).toFixed(3));
+                return `rgba(${r}, ${g}, ${b}, ${a})`;
+            }
+
+            function applyLightDarkBlendVars(darkPct) {
+                const rootStyle = document.documentElement.style;
+                const t = Math.max(0, Math.min(100, Number(darkPct))) / 100;
+                const ratio = t;
+
+                const bgBase = interpolateHex("#eaf1ff", "#050811", ratio);
+                const bgMid = interpolateHex("#f5f8ff", "#091024", ratio);
+                const textMain = interpolateHex("#0f172a", "#f8fafc", ratio);
+                const textSub = interpolateHex("#334155", "#cbd5e1", ratio);
+                const textMuted = interpolateHex("#475569", "#94a3b8", ratio);
+
+                rootStyle.setProperty("--bg-base", bgBase);
+                rootStyle.setProperty("--bg-gradient-mid", bgMid);
+                rootStyle.setProperty("--text-main", textMain);
+                rootStyle.setProperty("--text-sub", textSub);
+                rootStyle.setProperty("--text-muted", textMuted);
+
+                rootStyle.setProperty("--glass-bg-1", interpolateRgba("rgba(255,255,255,0.74)", "rgba(16,25,48,0.56)", ratio));
+                rootStyle.setProperty("--glass-bg-2", interpolateRgba("rgba(244,248,255,0.66)", "rgba(9,14,28,0.72)", ratio));
+                rootStyle.setProperty("--glass-modal-1", interpolateRgba("rgba(255,255,255,0.97)", "rgba(15,23,44,0.94)", ratio));
+                rootStyle.setProperty("--glass-modal-2", interpolateRgba("rgba(245,249,255,0.99)", "rgba(7,11,22,0.98)", ratio));
+                rootStyle.setProperty("--glass-border", interpolateRgba("rgba(15,23,42,0.13)", "rgba(255,255,255,0.16)", ratio));
+                rootStyle.setProperty("--glass-specular-top", interpolateRgba("rgba(255,255,255,0.98)", "rgba(255,255,255,0.28)", ratio));
+                rootStyle.setProperty("--glass-specular-left", interpolateRgba("rgba(255,255,255,0.85)", "rgba(255,255,255,0.14)", ratio));
+                rootStyle.setProperty("--glass-shadow", interpolateRgba("rgba(30,58,138,0.13)", "rgba(0,0,0,0.65)", ratio));
+
+                rootStyle.setProperty("--chip-bg", interpolateRgba("rgba(255,255,255,0.76)", "rgba(255,255,255,0.08)", ratio));
+                rootStyle.setProperty("--chip-hover", interpolateRgba("rgba(255,255,255,0.96)", "rgba(255,255,255,0.15)", ratio));
+                rootStyle.setProperty("--input-bg", interpolateRgba("rgba(255,255,255,0.90)", "rgba(4,8,20,0.78)", ratio));
+                rootStyle.setProperty("--grid-line", interpolateRgba("rgba(15,23,42,0.13)", "rgba(255,255,255,0.12)", ratio));
+                rootStyle.setProperty("--grid-slot-bg", interpolateRgba("rgba(15,23,42,0.018)", "rgba(255,255,255,0.018)", ratio));
+                rootStyle.setProperty("--grid-head-1", interpolateRgba("rgba(255,255,255,0.88)", "rgba(24,37,68,0.78)", ratio));
+                rootStyle.setProperty("--grid-head-2", interpolateRgba("rgba(238,244,255,0.82)", "rgba(12,19,38,0.88)", ratio));
+                rootStyle.setProperty("--card-surface-1", interpolateRgba("rgba(255,255,255,0.84)", "rgba(24,38,72,0.68)", ratio));
+                rootStyle.setProperty("--card-surface-2", interpolateRgba("rgba(248,251,255,0.82)", "rgba(11,18,36,0.82)", ratio));
+                rootStyle.setProperty("--today-hero-surface", interpolateRgba("rgba(255,255,255,0.94)", "rgba(22,40,76,0.80)", ratio));
+                rootStyle.setProperty("--today-card-bright", interpolateRgba("rgba(255,255,255,0.97)", "rgba(30,54,98,0.86)", ratio));
+                rootStyle.setProperty("--tomorrow-card-bright", interpolateRgba("rgba(248,252,255,0.95)", "rgba(24,45,84,0.80)", ratio));
+                rootStyle.setProperty("--orb-opacity", String(lerpNum(0.5, 0.65, ratio).toFixed(3)));
+                rootStyle.setProperty("--mesh-line", interpolateRgba("rgba(15,23,42,0.032)", "rgba(255,255,255,0.025)", ratio));
+
+                const sliderEl = document.getElementById("lightDarkBalanceSlider");
+                const badgeEl = document.getElementById("lightDarkBalanceBadge");
+                if (sliderEl) sliderEl.value = String(Math.round(t * 100));
+                if (badgeEl) {
+                    const dVal = Math.round(t * 100);
+                    badgeEl.textContent = dVal === 0 ? "Light 0%" : dVal === 100 ? "100% Dark" : `${100 - dVal}% L / ${dVal}% D`;
+                }
+            }
+
+            function setLightDarkBalance(val) {
+                const clamped = Math.max(0, Math.min(100, Math.round(Number(val) || 0)));
+                appState.darkBalance = clamped;
+                appState.theme = clamped < 50 ? "light" : "dark";
+                applyThemeAndPalette(true);
+            }
+
             function applyThemeAndPalette(shouldSave = true) {
-                const isLight = appState.theme === "light";
+                const darkVal = typeof appState.darkBalance === "number"
+                    ? appState.darkBalance
+                    : (appState.theme === "light" ? 0 : 100);
+                const isLight = darkVal < 50;
                 document.documentElement.setAttribute(
                     "data-theme",
                     isLight ? "light" : "dark",
                 );
                 document.documentElement.classList.toggle("dark", !isLight);
+                applyLightDarkBlendVars(darkVal);
 
                 const metaTheme = document.getElementById("metaThemeColor");
                 if (metaTheme)
                     metaTheme.setAttribute(
                         "content",
-                        isLight ? "#eaf1ff" : "#050811",
+                        interpolateHex("#eaf1ff", "#050811", darkVal / 100),
                     );
 
                 const iconEl = document.getElementById("themeModeIcon");
                 const labelEl = document.getElementById("themeModeLabel");
                 if (iconEl) iconEl.textContent = isLight ? "☀️" : "🌙";
-                if (labelEl) labelEl.textContent = isLight ? "Light" : "Dark";
+                if (labelEl) {
+                    labelEl.textContent =
+                        darkVal === 0
+                            ? "Light"
+                            : darkVal === 100
+                              ? "Dark"
+                              : `${darkVal}% Dark`;
+                }
 
                 const rootStyle = document.documentElement.style;
                 rootStyle.setProperty("--accent-1", appState.customColor1);
@@ -2362,7 +2512,12 @@
             }
 
             function toggleDarkLightMode() {
-                appState.theme = appState.theme === "dark" ? "light" : "dark";
+                const cur = typeof appState.darkBalance === "number"
+                    ? appState.darkBalance
+                    : (appState.theme === "light" ? 0 : 100);
+                const nextVal = cur >= 50 ? 0 : 100;
+                appState.darkBalance = nextVal;
+                appState.theme = nextVal === 0 ? "light" : "dark";
                 applyThemeAndPalette(true);
             }
 
