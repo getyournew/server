@@ -60,9 +60,9 @@
                 --grid-head-2: rgba(12, 19, 38, 0.88);
                 --card-surface-1: rgba(24, 38, 72, 0.68);
                 --card-surface-2: rgba(11, 18, 36, 0.82);
-                --today-hero-surface: rgba(32, 62, 118, 0.92);
-                --today-card-bright: rgba(46, 86, 152, 0.96);
-                --tomorrow-card-bright: rgba(38, 72, 132, 0.92);
+                --today-hero-surface: rgba(22, 40, 76, 0.8);
+                --today-card-bright: rgba(30, 54, 98, 0.86);
+                --tomorrow-card-bright: rgba(24, 45, 84, 0.8);
                 --orb-opacity: 0.65;
                 --mesh-line: rgba(255, 255, 255, 0.025);
             }
@@ -92,9 +92,9 @@
                 --grid-head-2: rgba(238, 244, 255, 0.82);
                 --card-surface-1: rgba(255, 255, 255, 0.84);
                 --card-surface-2: rgba(248, 251, 255, 0.82);
-                --today-hero-surface: rgba(255, 255, 255, 0.99);
-                --today-card-bright: rgba(255, 255, 255, 1);
-                --tomorrow-card-bright: rgba(252, 254, 255, 0.99);
+                --today-hero-surface: rgba(255, 255, 255, 0.94);
+                --today-card-bright: rgba(255, 255, 255, 0.97);
+                --tomorrow-card-bright: rgba(248, 252, 255, 0.95);
                 --orb-opacity: 0.5;
                 --mesh-line: rgba(15, 23, 42, 0.032);
             }
@@ -306,18 +306,18 @@
             .liquid-today-hero {
                 background: linear-gradient(
                     135deg,
-                    rgba(var(--accent-3-rgb), 0.42) 0%,
-                    var(--today-hero-surface) 48%,
-                    rgba(var(--accent-1-rgb), 0.38) 100%
+                    rgba(var(--accent-3-rgb), 0.28) 0%,
+                    var(--today-hero-surface) 46%,
+                    rgba(var(--accent-1-rgb), 0.26) 100%
                 );
-                backdrop-filter: blur(22px) saturate(210%);
-                -webkit-backdrop-filter: blur(22px) saturate(210%);
-                border: 1.75px solid rgba(var(--accent-3-rgb), 0.88);
+                backdrop-filter: blur(22px) saturate(200%);
+                -webkit-backdrop-filter: blur(22px) saturate(200%);
+                border: 1.5px solid rgba(var(--accent-3-rgb), 0.68);
                 box-shadow:
-                    0 20px 48px -12px var(--glass-shadow),
-                    0 0 44px -6px rgba(var(--accent-3-rgb), 0.45),
-                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.58),
-                    inset 1px 0 0 0 rgba(255, 255, 255, 0.32);
+                    0 20px 46px -14px var(--glass-shadow),
+                    0 0 38px -8px rgba(var(--accent-3-rgb), 0.32),
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.42),
+                    inset 1px 0 0 0 var(--glass-specular-left);
                 transform: translateZ(0);
             }
 
@@ -402,18 +402,18 @@
             .today-pill-card {
                 background: linear-gradient(
                     140deg,
-                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.52) 0%,
-                    var(--today-card-bright) 52%,
-                    rgba(var(--card-hue2-rgb, var(--accent-1-rgb)), 0.42) 100%
+                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.36) 0%,
+                    var(--today-card-bright) 50%,
+                    rgba(var(--card-hue2-rgb, var(--accent-1-rgb)), 0.3) 100%
                 );
-                border: 1.5px solid
-                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.9);
+                border: 1.25px solid
+                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.68);
                 box-shadow:
-                    0 12px 28px -8px var(--glass-shadow),
-                    0 0 24px -4px rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.48),
-                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.56),
-                    inset 4px 0 0 0
-                        rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 1);
+                    0 10px 24px -8px var(--glass-shadow),
+                    0 0 18px -6px rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.34),
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.42),
+                    inset 3.5px 0 0 0
+                        rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.96);
                 contain: layout style paint;
                 transition:
                     transform 0.16s ease,
@@ -445,31 +445,30 @@
             .tomorrow-spotlight-box {
                 background: linear-gradient(
                     135deg,
-                    rgba(var(--accent-1-rgb), 0.36) 0%,
-                    var(--tomorrow-card-bright) 52%,
-                    rgba(var(--accent-2-rgb), 0.34) 100%
+                    rgba(var(--accent-1-rgb), 0.22) 0%,
+                    var(--tomorrow-card-bright) 50%,
+                    rgba(var(--accent-2-rgb), 0.22) 100%
                 );
-                border: 1.5px solid rgba(var(--accent-1-rgb), 0.78);
+                border: 1px solid rgba(var(--accent-1-rgb), 0.54);
                 box-shadow:
-                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.5),
-                    0 10px 26px -8px rgba(var(--accent-1-rgb), 0.42);
+                    inset 0 1px 0 0 rgba(255, 255, 255, 0.34),
+                    0 8px 22px -10px rgba(var(--accent-1-rgb), 0.28);
             }
 
             .tomorrow-pill-card {
                 background: linear-gradient(
                     140deg,
-                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.46) 0%,
+                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.3) 0%,
                     var(--tomorrow-card-bright) 52%,
-                    rgba(var(--card-hue2-rgb, var(--accent-2-rgb)), 0.38) 100%
+                    rgba(var(--card-hue2-rgb, var(--accent-2-rgb)), 0.24) 100%
                 );
-                border: 1.25px solid
-                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.82);
+                border: 1px solid
+                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.58);
                 box-shadow:
-                    0 8px 22px -6px var(--glass-shadow),
-                    0 0 18px -5px rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.36),
-                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.52),
-                    inset 3.5px 0 0 0
-                        rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.98);
+                    0 6px 18px -6px var(--glass-shadow),
+                    inset 0 1px 0 0 rgba(255, 255, 255, 0.38),
+                    inset 3px 0 0 0
+                        rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.92);
                 contain: layout style paint;
                 transition:
                     transform 0.16s ease,
@@ -536,20 +535,27 @@
             .grid-header-today {
                 background: linear-gradient(
                     180deg,
-                    rgba(var(--accent-3-rgb), 0.48) 0%,
-                    rgba(var(--accent-1-rgb), 0.34) 100%
+                    rgba(var(--accent-3-rgb), 0.62) 0%,
+                    var(--today-card-bright) 55%,
+                    rgba(var(--accent-3-rgb), 0.38) 100%
                 );
-                border-bottom: 2px solid rgba(var(--accent-3-rgb), 0.92);
-                box-shadow: inset 0 2px 0 0 rgba(255, 255, 255, 0.45);
+                border-bottom: 2.5px solid rgba(var(--accent-3-rgb), 1);
+                box-shadow:
+                    0 4px 18px -4px rgba(var(--accent-3-rgb), 0.55),
+                    inset 0 2px 0 0 rgba(255, 255, 255, 0.72);
             }
 
             .grid-header-tomorrow:not(.grid-header-today) {
                 background: linear-gradient(
                     180deg,
-                    rgba(var(--accent-1-rgb), 0.36) 0%,
-                    rgba(var(--accent-2-rgb), 0.24) 100%
+                    rgba(var(--accent-1-rgb), 0.54) 0%,
+                    var(--tomorrow-card-bright) 55%,
+                    rgba(var(--accent-2-rgb), 0.34) 100%
                 );
-                border-bottom: 1.5px solid rgba(var(--accent-1-rgb), 0.78);
+                border-bottom: 2px solid rgba(var(--accent-1-rgb), 0.96);
+                box-shadow:
+                    0 4px 16px -4px rgba(var(--accent-1-rgb), 0.45),
+                    inset 0 2px 0 0 rgba(255, 255, 255, 0.62);
             }
 
             .grid-header-focused:not(.grid-header-today) {
@@ -618,11 +624,21 @@
             }
 
             .grid-col-today {
-                background-color: rgba(var(--accent-3-rgb), 0.15);
+                background: linear-gradient(
+                    90deg,
+                    rgba(var(--accent-3-rgb), 0.22) 0%,
+                    rgba(var(--accent-3-rgb), 0.14) 50%,
+                    rgba(var(--accent-3-rgb), 0.22) 100%
+                );
             }
 
             .grid-col-tomorrow:not(.grid-col-today) {
-                background-color: rgba(var(--accent-1-rgb), 0.085);
+                background: linear-gradient(
+                    90deg,
+                    rgba(var(--accent-1-rgb), 0.16) 0%,
+                    rgba(var(--accent-1-rgb), 0.1) 50%,
+                    rgba(var(--accent-1-rgb), 0.16) 100%
+                );
             }
 
             .grid-col-focused:not(.grid-col-today) {
@@ -662,31 +678,36 @@
 
             .liquid-card-today {
                 background: linear-gradient(
-                    140deg,
-                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.4) 0%,
-                    var(--today-card-bright) 52%,
-                    rgba(var(--accent-3-rgb), 0.34) 100%
+                    145deg,
+                    rgba(var(--accent-3-rgb), 0.42) 0%,
+                    var(--today-card-bright) 50%,
+                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.38) 100%
                 ) !important;
-                border-width: 1.5px;
-                border-color: rgba(var(--accent-3-rgb), 0.95);
+                border-width: 1.75px !important;
+                border-color: rgba(var(--accent-3-rgb), 1) !important;
+                filter: brightness(1.08);
                 box-shadow:
-                    0 0 26px rgba(var(--accent-3-rgb), 0.34),
-                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.45),
-                    inset 3.5px 0 0 0 rgba(var(--accent-3-rgb), 0.98);
+                    0 0 28px rgba(var(--accent-3-rgb), 0.48),
+                    0 10px 22px -6px var(--glass-shadow),
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.72),
+                    inset 4px 0 0 0 rgba(var(--accent-3-rgb), 1);
             }
 
             .liquid-card-tomorrow {
                 background: linear-gradient(
-                    140deg,
-                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.34) 0%,
-                    var(--tomorrow-card-bright) 52%,
-                    rgba(var(--card-hue2-rgb, var(--accent-2-rgb)), 0.28) 100%
-                );
-                border-color: rgba(var(--accent-1-rgb), 0.8);
+                    145deg,
+                    rgba(var(--accent-1-rgb), 0.38) 0%,
+                    var(--tomorrow-card-bright) 50%,
+                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.34) 100%
+                ) !important;
+                border-width: 1.5px !important;
+                border-color: rgba(var(--accent-1-rgb), 0.95) !important;
+                filter: brightness(1.06);
                 box-shadow:
-                    0 8px 20px -6px var(--glass-shadow),
-                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.36),
-                    inset 3px 0 0 0 rgba(var(--accent-1-rgb), 0.92);
+                    0 0 24px rgba(var(--accent-1-rgb), 0.38),
+                    0 10px 20px -6px var(--glass-shadow),
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.64),
+                    inset 3.5px 0 0 0 rgba(var(--accent-1-rgb), 0.96);
             }
 
             .liquid-card-selected {
@@ -852,7 +873,7 @@
                                     "
                                     title="Phiên bản cập nhật ứng dụng"
                                 >
-                                    V1.2.0
+                                    v001.002.000
                                 </span>
                                 <span
                                     id="semesterBadge"
@@ -4518,10 +4539,10 @@
                 document.title = `${displayTitle} (${APP_VERSION})`;
 
                 const verBadgeEl = document.getElementById("appVersionBadge");
-                if (verBadgeEl) verBadgeEl.textContent = `${APP_VERSION}`;
+                if (verBadgeEl) verBadgeEl.textContent = `v${APP_VERSION}`;
                 const footerVerEl = document.getElementById("footerAppVersionText");
                 if (footerVerEl) {
-                    footerVerEl.textContent = `Thời Khóa Biểu SGU • ${APP_VERSION} • Lưu cục bộ tối ưu bộ nhớ`;
+                    footerVerEl.textContent = `Thời Khóa Biểu SGU • v${APP_VERSION} • Lưu cục bộ tối ưu bộ nhớ`;
                 }
 
                 document.getElementById("semesterBadge").textContent =
@@ -5315,9 +5336,15 @@
               <div class="flex items-center justify-between gap-1">
                 <span
                   class="px-2 py-0.5 rounded-full text-[10px] font-mono-code font-bold text-main border truncate"
-                  style="background: rgba(${huePair.primary}, 0.25); border-color: rgba(${huePair.primary}, 0.55);"
+                  style="${
+                      isTodayCard
+                          ? "background: rgba(var(--accent-3-rgb), 0.38); border-color: rgba(var(--accent-3-rgb), 0.88);"
+                          : isTomorrowCard
+                            ? "background: rgba(var(--accent-1-rgb), 0.36); border-color: rgba(var(--accent-1-rgb), 0.85);"
+                            : `background: rgba(${huePair.primary}, 0.25); border-color: rgba(${huePair.primary}, 0.55);`
+                  }"
                 >
-                  ${liveInfo?.state === "live" ? "● Đang học • " : ""}T${c.startPeriod}→${c.endPeriod} • ${startClock}–${endClock}
+                  ${isTodayCard ? "● HÔM NAY • " : isTomorrowCard ? "▸ NGÀY MAI • " : ""}${liveInfo?.state === "live" ? "Đang học • " : ""}T${c.startPeriod}→${c.endPeriod} • ${startClock}–${endClock}
                 </span>
                 <span
                   class="course-check-badge ${isSelected ? "" : "hidden"} w-4 h-4 rounded-full font-extrabold text-[10px] flex items-center justify-center shrink-0 text-white"
