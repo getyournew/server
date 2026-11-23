@@ -60,9 +60,9 @@
                 --grid-head-2: rgba(12, 19, 38, 0.88);
                 --card-surface-1: rgba(24, 38, 72, 0.68);
                 --card-surface-2: rgba(11, 18, 36, 0.82);
-                --today-hero-surface: rgba(22, 40, 76, 0.8);
-                --today-card-bright: rgba(30, 54, 98, 0.86);
-                --tomorrow-card-bright: rgba(24, 45, 84, 0.8);
+                --today-hero-surface: rgba(32, 62, 118, 0.92);
+                --today-card-bright: rgba(46, 86, 152, 0.96);
+                --tomorrow-card-bright: rgba(38, 72, 132, 0.92);
                 --orb-opacity: 0.65;
                 --mesh-line: rgba(255, 255, 255, 0.025);
             }
@@ -92,9 +92,9 @@
                 --grid-head-2: rgba(238, 244, 255, 0.82);
                 --card-surface-1: rgba(255, 255, 255, 0.84);
                 --card-surface-2: rgba(248, 251, 255, 0.82);
-                --today-hero-surface: rgba(255, 255, 255, 0.94);
-                --today-card-bright: rgba(255, 255, 255, 0.97);
-                --tomorrow-card-bright: rgba(248, 252, 255, 0.95);
+                --today-hero-surface: rgba(255, 255, 255, 0.99);
+                --today-card-bright: rgba(255, 255, 255, 1);
+                --tomorrow-card-bright: rgba(252, 254, 255, 0.99);
                 --orb-opacity: 0.5;
                 --mesh-line: rgba(15, 23, 42, 0.032);
             }
@@ -306,18 +306,18 @@
             .liquid-today-hero {
                 background: linear-gradient(
                     135deg,
-                    rgba(var(--accent-3-rgb), 0.28) 0%,
-                    var(--today-hero-surface) 46%,
-                    rgba(var(--accent-1-rgb), 0.26) 100%
+                    rgba(var(--accent-3-rgb), 0.42) 0%,
+                    var(--today-hero-surface) 48%,
+                    rgba(var(--accent-1-rgb), 0.38) 100%
                 );
-                backdrop-filter: blur(22px) saturate(200%);
-                -webkit-backdrop-filter: blur(22px) saturate(200%);
-                border: 1.5px solid rgba(var(--accent-3-rgb), 0.68);
+                backdrop-filter: blur(22px) saturate(210%);
+                -webkit-backdrop-filter: blur(22px) saturate(210%);
+                border: 1.75px solid rgba(var(--accent-3-rgb), 0.88);
                 box-shadow:
-                    0 20px 46px -14px var(--glass-shadow),
-                    0 0 38px -8px rgba(var(--accent-3-rgb), 0.32),
-                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.42),
-                    inset 1px 0 0 0 var(--glass-specular-left);
+                    0 20px 48px -12px var(--glass-shadow),
+                    0 0 44px -6px rgba(var(--accent-3-rgb), 0.45),
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.58),
+                    inset 1px 0 0 0 rgba(255, 255, 255, 0.32);
                 transform: translateZ(0);
             }
 
@@ -402,18 +402,18 @@
             .today-pill-card {
                 background: linear-gradient(
                     140deg,
-                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.36) 0%,
-                    var(--today-card-bright) 50%,
-                    rgba(var(--card-hue2-rgb, var(--accent-1-rgb)), 0.3) 100%
+                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.52) 0%,
+                    var(--today-card-bright) 52%,
+                    rgba(var(--card-hue2-rgb, var(--accent-1-rgb)), 0.42) 100%
                 );
-                border: 1.25px solid
-                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.68);
+                border: 1.5px solid
+                    rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.9);
                 box-shadow:
-                    0 10px 24px -8px var(--glass-shadow),
-                    0 0 18px -6px rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.34),
-                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.42),
-                    inset 3.5px 0 0 0
-                        rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.96);
+                    0 12px 28px -8px var(--glass-shadow),
+                    0 0 24px -4px rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 0.48),
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.56),
+                    inset 4px 0 0 0
+                        rgba(var(--card-hue-rgb, var(--accent-3-rgb)), 1);
                 contain: layout style paint;
                 transition:
                     transform 0.16s ease,
@@ -445,30 +445,31 @@
             .tomorrow-spotlight-box {
                 background: linear-gradient(
                     135deg,
-                    rgba(var(--accent-1-rgb), 0.22) 0%,
-                    var(--tomorrow-card-bright) 50%,
-                    rgba(var(--accent-2-rgb), 0.22) 100%
+                    rgba(var(--accent-1-rgb), 0.36) 0%,
+                    var(--tomorrow-card-bright) 52%,
+                    rgba(var(--accent-2-rgb), 0.34) 100%
                 );
-                border: 1px solid rgba(var(--accent-1-rgb), 0.54);
+                border: 1.5px solid rgba(var(--accent-1-rgb), 0.78);
                 box-shadow:
-                    inset 0 1px 0 0 rgba(255, 255, 255, 0.34),
-                    0 8px 22px -10px rgba(var(--accent-1-rgb), 0.28);
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.5),
+                    0 10px 26px -8px rgba(var(--accent-1-rgb), 0.42);
             }
 
             .tomorrow-pill-card {
                 background: linear-gradient(
                     140deg,
-                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.3) 0%,
+                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.46) 0%,
                     var(--tomorrow-card-bright) 52%,
-                    rgba(var(--card-hue2-rgb, var(--accent-2-rgb)), 0.24) 100%
+                    rgba(var(--card-hue2-rgb, var(--accent-2-rgb)), 0.38) 100%
                 );
-                border: 1px solid
-                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.58);
+                border: 1.25px solid
+                    rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.82);
                 box-shadow:
-                    0 6px 18px -6px var(--glass-shadow),
-                    inset 0 1px 0 0 rgba(255, 255, 255, 0.38),
-                    inset 3px 0 0 0
-                        rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.92);
+                    0 8px 22px -6px var(--glass-shadow),
+                    0 0 18px -5px rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.36),
+                    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.52),
+                    inset 3.5px 0 0 0
+                        rgba(var(--card-hue-rgb, var(--accent-1-rgb)), 0.98);
                 contain: layout style paint;
                 transition:
                     transform 0.16s ease,
@@ -851,7 +852,7 @@
                                     "
                                     title="Phiên bản cập nhật ứng dụng"
                                 >
-                                    v001.002.000
+                                    V1.2.0
                                 </span>
                                 <span
                                     id="semesterBadge"
@@ -1143,7 +1144,7 @@
                     >Chạm thẻ môn học để chọn / hủy chọn • Vuốt ngang để xem các
                     thứ trong tuần</span
                 >
-                <span id="footerAppVersionText">Thời Khóa Biểu SGU • v001.002.000 • Lưu cục bộ tối ưu bộ nhớ</span>
+                <span id="footerAppVersionText">Thời Khóa Biểu SGU • V1.2.0 • Lưu cục bộ tối ưu bộ nhớ</span>
             </footer>
         </main>
 
@@ -1942,7 +1943,7 @@
                 "139, 92, 246",
                 "244, 63, 94",
             ];
-            const APP_VERSION = "001.002.000";
+            const APP_VERSION = "V1.2.0";
             const STORAGE_KEY = "sgu_liquid_timetable_v4";
             const LEGACY_STORAGE_KEY_V3 = "sgu_liquid_timetable_v3";
             const CREDS_STORAGE_KEY = "sgu_colab_creds_v1";
@@ -4514,13 +4515,13 @@
                     : "Thời Khóa Biểu SGU";
                 const titleEl = document.getElementById("mainAppTitle");
                 if (titleEl) titleEl.textContent = displayTitle;
-                document.title = `${displayTitle} (v${APP_VERSION})`;
+                document.title = `${displayTitle} (${APP_VERSION})`;
 
                 const verBadgeEl = document.getElementById("appVersionBadge");
-                if (verBadgeEl) verBadgeEl.textContent = `v${APP_VERSION}`;
+                if (verBadgeEl) verBadgeEl.textContent = `${APP_VERSION}`;
                 const footerVerEl = document.getElementById("footerAppVersionText");
                 if (footerVerEl) {
-                    footerVerEl.textContent = `Thời Khóa Biểu SGU • v${APP_VERSION} • Lưu cục bộ tối ưu bộ nhớ`;
+                    footerVerEl.textContent = `Thời Khóa Biểu SGU • ${APP_VERSION} • Lưu cục bộ tối ưu bộ nhớ`;
                 }
 
                 document.getElementById("semesterBadge").textContent =
