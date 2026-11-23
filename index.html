@@ -1401,7 +1401,7 @@
                             onchange="handleSaveCredentialsToggle()"
                             class="rounded"
                         />
-                        <span>Ghi nhớ MSSV & mật khẩu cục bộ</span>
+                        <span>Ghi nhớ MSSV cục bộ (không lưu mật khẩu)</span>
                     </label>
                 </div>
 
@@ -1847,7 +1847,10 @@
             const LEGACY_STORAGE_KEY_V3 = "sgu_liquid_timetable_v3";
             const CREDS_STORAGE_KEY = "sgu_colab_creds_v1";
             const ENDPOINT_STORAGE_KEY = "sgu_colab_endpoint_v1";
-            const SERVER_CONFIG_PATH = "./server_config.json";
+            const SERVER_CONFIG_PATHS = [
+                "./server_configs.json",
+                "./server_config.json",
+            ];
             const PLACEHOLDER_API_URL =
                 "https://your-colab-tunnel.trycloudflare.com";
             const UI_PREFS_KEY = "sgu_liquid_ui_prefs_v2";
@@ -1925,18 +1928,26 @@
             // =========================================================================
             const SUBJECT_HUE_CACHE = new Map();
 
+            function sanitizeHexColor(hex, fallback = "#06b6d4") {
+                const raw = String(hex || "").trim();
+                if (/^#[0-9a-fA-F]{6}$/.test(raw)) return raw.toLowerCase();
+                if (/^#[0-9a-fA-F]{3}$/.test(raw)) {
+                    return (
+                        "#" +
+                        raw
+                            .slice(1)
+                            .split("")
+                            .map((ch) => ch + ch)
+                            .join("")
+                            .toLowerCase()
+                    );
+                }
+                return fallback;
+            }
+
             function hexToRgbString(hex) {
-                const clean = String(hex || "#06b6d4")
-                    .replace("#", "")
-                    .trim();
-                const full =
-                    clean.length === 3
-                        ? clean
-                              .split("")
-                              .map((ch) => ch + ch)
-                              .join("")
-                        : clean.padEnd(6, "0").slice(0, 6);
-                const num = parseInt(full, 16);
+                const safeHex = sanitizeHexColor(hex, "#06b6d4");
+                const num = parseInt(safeHex.slice(1), 16);
                 if (Number.isNaN(num)) return "6, 182, 212";
                 return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
             }
@@ -2081,11 +2092,11 @@
                             appState.theme = p.theme;
                         if (p.presetId) appState.presetId = p.presetId;
                         if (p.customColor1)
-                            appState.customColor1 = p.customColor1;
+                            appState.customColor1 = sanitizeHexColor(p.customColor1, "#06b6d4");
                         if (p.customColor2)
-                            appState.customColor2 = p.customColor2;
+                            appState.customColor2 = sanitizeHexColor(p.customColor2, "#6366f1");
                         if (p.customColor3)
-                            appState.customColor3 = p.customColor3;
+                            appState.customColor3 = sanitizeHexColor(p.customColor3, "#10b981");
                         if (
                             p.uiScaleMode === "manual" ||
                             p.uiScaleMode === "auto"
@@ -2188,19 +2199,19 @@
 
             function applyCustomPrimaryColor(hex) {
                 appState.presetId = "custom";
-                appState.customColor1 = hex;
+                appState.customColor1 = sanitizeHexColor(hex, appState.customColor1);
                 applyThemeAndPalette(true);
             }
 
             function applyCustomSecondaryColor(hex) {
                 appState.presetId = "custom";
-                appState.customColor2 = hex;
+                appState.customColor2 = sanitizeHexColor(hex, appState.customColor2);
                 applyThemeAndPalette(true);
             }
 
             function applyCustomTertiaryColor(hex) {
                 appState.presetId = "custom";
-                appState.customColor3 = hex;
+                appState.customColor3 = sanitizeHexColor(hex, appState.customColor3);
                 applyThemeAndPalette(true);
             }
 
@@ -2389,19 +2400,29 @@
             function fallbackCopyExec(text) {
                 const ta = document.createElement("textarea");
                 ta.value = text;
+                ta.setAttribute("readonly", "");
                 ta.style.position = "fixed";
+                ta.style.left = "-9999px";
+                ta.style.top = "0";
                 ta.style.opacity = "0";
                 document.body.appendChild(ta);
                 ta.select();
+                ta.setSelectionRange(0, ta.value.length);
                 try {
                     document.execCommand("copy");
                 } catch (e) {}
                 document.body.removeChild(ta);
             }
 
-            function copyTextSafe(text) {
-                fallbackCopyExec(text);
-                return Promise.resolve();
+            async function copyTextSafe(text) {
+                const str = String(text || "");
+                if (navigator.clipboard && window.isSecureContext) {
+                    try {
+                        await navigator.clipboard.writeText(str);
+                        return;
+                    } catch (e) {}
+                }
+                fallbackCopyExec(str);
             }
 
             // =========================================================================
@@ -2487,6 +2508,7 @@
                         ) {
                             appState.studentName = parsed.studentName || "";
                             appState.semesters = parsed.semesters
+                                .filter((s) => s && typeof s === "object")
                                 .map((s, sIdx) => ({
                                     semester: String(
                                         s.semester || `Học kỳ ${sIdx + 1}`,
@@ -2494,13 +2516,15 @@
                                     weeks: (Array.isArray(s.weeks)
                                         ? s.weeks
                                         : []
-                                    ).map((w, wIdx) =>
-                                        normalizeSingleWeekObject(
-                                            w,
-                                            wIdx,
-                                            `hk${sIdx + 1}`,
+                                    )
+                                        .filter((w) => w && typeof w === "object")
+                                        .map((w, wIdx) =>
+                                            normalizeSingleWeekObject(
+                                                w,
+                                                wIdx,
+                                                `hk${sIdx + 1}`,
+                                            ),
                                         ),
-                                    ),
                                 }))
                                 .filter((s) => s.weeks.length > 0);
 
@@ -2584,9 +2608,10 @@
                     .trim()
                     .replace(/\/+$/, "");
                 if (!cleaned || cleaned === PLACEHOLDER_API_URL) return "";
+                if (!/^https?:\/\//i.test(cleaned)) return "";
                 return cleaned
-                    .replace(/\/api\/(sync-start|sync-status|sync-stream)$/, "")
-                    .replace(/\/health$/, "");
+                    .replace(/\/api\/(sync-start|sync-status|sync-stream)$/i, "")
+                    .replace(/\/health$/i, "");
             }
 
             function updateConfigSourceLabel(text) {
@@ -2634,48 +2659,48 @@
                     return queryApi;
                 }
 
-                try {
-                    const res = await fetch(
-                        `${SERVER_CONFIG_PATH}?_t=${Date.now()}`,
-                        {
-                            method: "GET",
-                            cache: "no-store",
-                        },
-                    );
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    const cfg = await res.json();
-                    const rawFromJson =
-                        cfg?.apiUrl ||
-                        cfg?.serverUrl ||
-                        cfg?.api ||
-                        cfg?.url ||
-                        cfg?.endpoint ||
-                        "";
-                    const normalized = normalizeApiUrl(rawFromJson);
-
-                    if (normalized) {
-                        serverConfigState.loadedUrl = normalized;
-                        serverConfigState.source = "json";
-                        if (endpointInput) endpointInput.value = normalized;
-                        updateConfigSourceLabel(
-                            `Đã tự động nạp từ server_config.json (${normalized})`,
+                for (const cfgPath of SERVER_CONFIG_PATHS) {
+                    try {
+                        const res = await fetch(
+                            `${cfgPath}?_t=${Date.now()}`,
+                            {
+                                method: "GET",
+                                cache: "no-store",
+                            },
                         );
-                        if (forceReload) {
-                            showToast(
-                                "Đã cập nhật địa chỉ API từ server_config.json!",
-                            );
-                        }
-                        return normalized;
-                    }
+                        if (!res.ok) continue;
+                        const cfg = await res.json();
+                        const rawFromJson =
+                            cfg?.apiUrl ||
+                            cfg?.serverUrl ||
+                            cfg?.api ||
+                            cfg?.url ||
+                            cfg?.endpoint ||
+                            "";
+                        const normalized = normalizeApiUrl(rawFromJson);
 
-                    updateConfigSourceLabel(
-                        "Tệp server_config.json chưa điền apiUrl hợp lệ.",
-                    );
-                } catch (err) {
-                    updateConfigSourceLabel(
-                        "Không đọc được server_config.json (dùng cấu hình dự phòng).",
-                    );
+                        if (normalized) {
+                            const cfgFileName = cfgPath.replace(/^\.\//, "");
+                            serverConfigState.loadedUrl = normalized;
+                            serverConfigState.source = "json";
+                            if (endpointInput) endpointInput.value = normalized;
+                            updateConfigSourceLabel(
+                                `Đã tự động nạp từ ${cfgFileName} (${normalized})`,
+                            );
+                            if (forceReload) {
+                                showToast(
+                                    `Đã cập nhật địa chỉ API từ ${cfgFileName}!`,
+                                );
+                            }
+                            return normalized;
+                        }
+                    } catch (err) {
+                        // Thử tệp cấu hình tiếp theo
+                    }
                 }
+                updateConfigSourceLabel(
+                    "Tệp server_configs.json / server_config.json chưa điền apiUrl hợp lệ.",
+                );
 
                 const fallbackSaved = normalizeApiUrl(
                     localStorage.getItem(ENDPOINT_STORAGE_KEY) || "",
@@ -2709,12 +2734,19 @@
                         const creds = JSON.parse(rawCreds);
                         if (creds && creds.username) {
                             document.getElementById("syncMssvInput").value =
-                                creds.username;
-                            document.getElementById("syncPassInput").value =
-                                creds.password || "";
+                                String(creds.username).trim();
                             document.getElementById(
                                 "saveCredsCheckbox",
                             ).checked = true;
+                            // Xóa mật khẩu cũ nếu từng lưu ở phiên bản trước để đảm bảo an toàn
+                            if (creds.password) {
+                                localStorage.setItem(
+                                    CREDS_STORAGE_KEY,
+                                    JSON.stringify({
+                                        username: String(creds.username).trim(),
+                                    }),
+                                );
+                            }
                         }
                     }
                 } catch (e) {}
@@ -2792,7 +2824,9 @@
                     `wk${fallbackIndex + 1}`;
                 const idPrefix = `${safeSem}-${safeWeek}`;
 
-                const courses = rawCourses.map((c, idx) => {
+                const courses = rawCourses
+                    .filter((c) => c && typeof c === "object")
+                    .map((c, idx) => {
                     const startPeriod = Math.max(
                         1,
                         Math.min(14, Number(c.startPeriod) || 1),
@@ -2979,6 +3013,15 @@
                 if (!liveSyncState.isRunning) {
                     checkServerHealth(true);
                 }
+                const mssvEl = document.getElementById("syncMssvInput");
+                const passEl = document.getElementById("syncPassInput");
+                setTimeout(() => {
+                    if (mssvEl && !mssvEl.value.trim()) {
+                        mssvEl.focus();
+                    } else if (passEl) {
+                        passEl.focus();
+                    }
+                }, 50);
             }
 
             function closeLiveSyncModal() {
@@ -3048,15 +3091,13 @@
 
             function saveCredentialsLocally() {
                 try {
+                    const mssv = document
+                        .getElementById("syncMssvInput")
+                        .value.trim();
+                    if (!mssv) return;
                     localStorage.setItem(
                         CREDS_STORAGE_KEY,
-                        JSON.stringify({
-                            username: document
-                                .getElementById("syncMssvInput")
-                                .value.trim(),
-                            password:
-                                document.getElementById("syncPassInput").value,
-                        }),
+                        JSON.stringify({ username: mssv }),
                     );
                 } catch (e) {}
             }
@@ -3082,6 +3123,8 @@
             const serverHealthState = {
                 status: "checking", // 'checking' | 'online' | 'offline' | 'unconfigured'
                 latencyMs: null,
+                requestSeq: 0,
+                activeController: null,
             };
 
             function renderServerStatusUI(state, latencyMs = null) {
@@ -3168,10 +3211,18 @@
             }
 
             async function checkServerHealth(silent = false) {
+                const reqId = ++serverHealthState.requestSeq;
+                if (serverHealthState.activeController) {
+                    try {
+                        serverHealthState.activeController.abort();
+                    } catch (e) {}
+                }
                 renderServerStatusUI("checking");
                 if (serverConfigState.readyPromise) {
                     await serverConfigState.readyPromise;
                 }
+                if (reqId !== serverHealthState.requestSeq) return false;
+
                 const base = getApiBaseUrl();
                 if (!base && isStaticHostedPage()) {
                     renderServerStatusUI("unconfigured");
@@ -3180,17 +3231,18 @@
                         .classList.remove("hidden");
                     setServerOfflineAlertVisible(
                         true,
-                        "Chưa cấu hình địa chỉ <code>apiUrl</code> trong tệp <strong>server_config.json</strong> hoặc server đang tắt. Vui lòng cập nhật link tunnel hoặc <strong>liên hệ chủ server</strong>.",
+                        "Chưa cấu hình địa chỉ <code>apiUrl</code> trong tệp <strong>server_configs.json</strong> hoặc server đang tắt. Vui lòng cập nhật link tunnel hoặc <strong>liên hệ chủ server</strong>.",
                     );
                     if (!silent) {
                         showToast(
-                            "Chưa có apiUrl trong server_config.json — Hãy kiểm tra cấu hình server.",
+                            "Chưa có apiUrl trong server_configs.json — Hãy kiểm tra cấu hình server.",
                         );
                     }
                     return false;
                 }
 
                 const controller = new AbortController();
+                serverHealthState.activeController = controller;
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
                 const t0 = performance.now();
 
@@ -3201,6 +3253,7 @@
                         signal: controller.signal,
                     });
                     clearTimeout(timeoutId);
+                    if (reqId !== serverHealthState.requestSeq) return false;
                     if (!res.ok) throw new Error(`HTTP ${res.status}`);
                     const data = await res.json();
                     if (data && data.status === "ok") {
@@ -3215,6 +3268,7 @@
                     throw new Error("Phản hồi không hợp lệ");
                 } catch (e) {
                     clearTimeout(timeoutId);
+                    if (reqId !== serverHealthState.requestSeq) return false;
                     renderServerStatusUI("offline");
                     setServerOfflineAlertVisible(true);
                     if (!silent) {
@@ -3223,6 +3277,10 @@
                         );
                     }
                     return false;
+                } finally {
+                    if (serverHealthState.activeController === controller) {
+                        serverHealthState.activeController = null;
+                    }
                 }
             }
 
@@ -3331,10 +3389,27 @@
                 }
             }
 
+            function maskStudentId(mssv) {
+                const s = String(mssv || "").trim();
+                if (s.length <= 4) return "****";
+                return `${s.slice(0, 4)}****${s.slice(-2)}`;
+            }
+
+            function clearProgressGlideInterval() {
+                if (liveSyncState.glideInterval) {
+                    clearInterval(liveSyncState.glideInterval);
+                    LifecycleManager.intervals.delete(liveSyncState.glideInterval);
+                    liveSyncState.glideInterval = null;
+                }
+            }
+
             function animateProgressSmoothlyTo100(durationMs = 700) {
+                clearProgressGlideInterval();
+                liveSyncState.isGlidingTo100 = true;
                 return new Promise((resolve) => {
                     const startPct = Math.max(1, Math.min(100, Math.round(liveSyncState.percent || 1)));
                     if (startPct >= 100) {
+                        liveSyncState.isGlidingTo100 = false;
                         renderProgressVisuals(100);
                         resolve();
                         return;
@@ -3342,18 +3417,27 @@
                     const steps = 100 - startPct;
                     const intervalMs = Math.max(12, Math.min(28, Math.floor(durationMs / steps)));
                     let cur = startPct;
-                    const glideId = setInterval(() => {
-                        cur += 1;
-                        renderProgressVisuals(cur);
-                        const activeBarEl = document.getElementById("terminalActiveWeekBar");
-                        const activePctEl = document.getElementById("terminalActiveWeekPct");
-                        if (activeBarEl) activeBarEl.textContent = buildAsciiProgressText(100, 12);
-                        if (activePctEl) activePctEl.textContent = "100%";
-                        if (cur >= 100) {
-                            clearInterval(glideId);
-                            resolve();
-                        }
-                    }, intervalMs);
+                    liveSyncState.glideInterval = LifecycleManager.registerInterval(
+                        setInterval(() => {
+                            if (!liveSyncState.isRunning) {
+                                clearProgressGlideInterval();
+                                liveSyncState.isGlidingTo100 = false;
+                                resolve();
+                                return;
+                            }
+                            cur += 1;
+                            renderProgressVisuals(cur);
+                            const activeBarEl = document.getElementById("terminalActiveWeekBar");
+                            const activePctEl = document.getElementById("terminalActiveWeekPct");
+                            if (activeBarEl) activeBarEl.textContent = buildAsciiProgressText(100, 12);
+                            if (activePctEl) activePctEl.textContent = "100%";
+                            if (cur >= 100) {
+                                clearProgressGlideInterval();
+                                liveSyncState.isGlidingTo100 = false;
+                                resolve();
+                            }
+                        }, intervalMs),
+                    );
                 });
             }
 
@@ -3385,7 +3469,7 @@
                         }
 
                         // Chạy chữ tiến trình tuần tự từng số +1% (1% -> 2% -> 3% ... -> 100%)
-                        if (liveSyncState.isRunning) {
+                        if (liveSyncState.isRunning && !liveSyncState.isGlidingTo100) {
                             const target = liveSyncState.targetPercent || 1;
                             if (liveSyncState.percent < target) {
                                 renderProgressVisuals(liveSyncState.percent + 1);
@@ -3514,6 +3598,8 @@
                 if (liveSyncState.abortController)
                     liveSyncState.abortController.abort();
                 liveSyncState.isRunning = false;
+                liveSyncState.isGlidingTo100 = false;
+                clearProgressGlideInterval();
                 stopHudStopwatch();
                 renderHudWeekMatrix();
                 document.getElementById("btnStartLiveSync").disabled = false;
@@ -3538,7 +3624,7 @@
                 const username = document
                     .getElementById("syncMssvInput")
                     .value.trim();
-                const password = document
+                let password = document
                     .getElementById("syncPassInput")
                     .value.trim();
                 const apiBase = getApiBaseUrl();
@@ -3572,7 +3658,7 @@
                 const signal = liveSyncState.abortController.signal;
 
                 resetTerminalOutput(
-                    `sgu-sync --user ${username} --scope ${liveSyncState.scope}`,
+                    `sgu-sync --user ${maskStudentId(username)} --scope ${liveSyncState.scope}`,
                 );
 
                 document.getElementById("btnStartLiveSync").disabled = true;
@@ -3600,14 +3686,18 @@
                 let semesterMetaLogged = false;
 
                 try {
+                    const serializedCreds = JSON.stringify({
+                        username,
+                        password,
+                        scope: liveSyncState.scope,
+                    });
+                    password = "";
+                    document.getElementById("syncPassInput").value = "";
+
                     const startRes = await fetch(`${apiBase}/api/sync-start`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            username,
-                            password,
-                            scope: liveSyncState.scope,
-                        }),
+                        body: serializedCreds,
                         signal,
                     });
                     if (!startRes.ok) {
@@ -3637,27 +3727,54 @@
                         false,
                     );
 
+                    let consecutivePollFailures = 0;
                     while (liveSyncState.isRunning) {
                         await sleepMs(650);
                         if (signal.aborted) break;
 
-                        const statusRes = await fetch(
-                            `${apiBase}/api/sync-status?id=${encodeURIComponent(jobId)}&_t=${Date.now()}`,
-                            { method: "GET", signal },
-                        );
-                        if (!statusRes.ok) {
-                            const isUnreachable = [
-                                404, 502, 503, 504, 521, 522, 523, 530,
-                            ].includes(statusRes.status);
-                            const err = new Error(
-                                isUnreachable
-                                    ? `Mất kết nối tới máy chủ (HTTP ${statusRes.status}). Server có thể đang tạm dừng hoặc tắt — vui lòng liên hệ chủ server.`
-                                    : `Mất kết nối tới Server (HTTP ${statusRes.status}).`,
+                        let job = null;
+                        try {
+                            const statusRes = await fetch(
+                                `${apiBase}/api/sync-status?id=${encodeURIComponent(jobId)}&_t=${Date.now()}`,
+                                { method: "GET", signal },
                             );
-                            err.isConnectionError = isUnreachable;
-                            throw err;
+                            if (!statusRes.ok) {
+                                if (statusRes.status === 404) {
+                                    const err = new Error(
+                                        "Phiên quét không còn tồn tại trên máy chủ (máy chủ vừa khởi động lại). Vui lòng thử quét lại.",
+                                    );
+                                    err.isConnectionError = false;
+                                    throw err;
+                                }
+                                const isUnreachable = [
+                                    502, 503, 504, 521, 522, 523, 530,
+                                ].includes(statusRes.status);
+                                const err = new Error(
+                                    isUnreachable
+                                        ? `Mất kết nối tới máy chủ (HTTP ${statusRes.status}). Server có thể đang tạm dừng hoặc tắt — vui lòng liên hệ chủ server.`
+                                        : `Mất kết nối tới Server (HTTP ${statusRes.status}).`,
+                                );
+                                err.isConnectionError = isUnreachable;
+                                throw err;
+                            }
+                            job = await statusRes.json();
+                            consecutivePollFailures = 0;
+                        } catch (pollErr) {
+                            if (signal.aborted || pollErr.name === "AbortError") {
+                                throw pollErr;
+                            }
+                            consecutivePollFailures += 1;
+                            if (consecutivePollFailures >= 3) {
+                                throw pollErr;
+                            }
+                            appendTerminalLog(
+                                "WARN",
+                                `Kết nối tạm gián đoạn, đang thử nối lại (${consecutivePollFailures}/2)...`,
+                                true,
+                            );
+                            await sleepMs(900);
+                            continue;
                         }
-                        const job = await statusRes.json();
 
                         if (job.studentName && !authLogged) {
                             authLogged = true;
@@ -3738,13 +3855,7 @@
                             );
                             renderHudWeekMatrix();
 
-                            if (
-                                !document.getElementById("saveCredsCheckbox")
-                                    .checked
-                            ) {
-                                document.getElementById("syncPassInput").value =
-                                    "";
-                            }
+
                             applyImportedJson(job.data);
 
                             document.getElementById(
@@ -4012,6 +4123,9 @@
                 if (appState.semesters.length === 0) {
                     appState.studentName = "";
                     appState.selectedCourseIds.clear();
+                    appState.lastWeekNavHtml = "";
+                    appState.lastHeroHtml = "";
+                    appState.lastGridHtml = "";
                 }
                 saveTimetableToStorage();
                 renderAll();
@@ -4061,6 +4175,9 @@
                 if (appState.semesters.length === 0) {
                     appState.studentName = "";
                     appState.selectedCourseIds.clear();
+                    appState.lastWeekNavHtml = "";
+                    appState.lastHeroHtml = "";
+                    appState.lastGridHtml = "";
                 }
                 saveTimetableToStorage();
                 renderAll();
@@ -4276,8 +4393,14 @@
             // =========================================================================
             function renderAll() {
                 const totalSemesters = appState.semesters.length;
+                if (appState.currentSemesterIndex >= totalSemesters) {
+                    appState.currentSemesterIndex = Math.max(0, totalSemesters - 1);
+                }
                 const activeSem = getActiveSemesterObj();
                 const activeWeeks = getActiveWeeksList();
+                if (appState.currentWeekIndex >= activeWeeks.length) {
+                    appState.currentWeekIndex = Math.max(0, activeWeeks.length - 1);
+                }
                 const activeWeek =
                     activeWeeks.length > 0
                         ? activeWeeks[appState.currentWeekIndex]
@@ -5068,6 +5191,28 @@
                         (!toggleBtn || !toggleBtn.contains(e.target))
                     ) {
                         closeColorPopover();
+                    }
+                });
+
+                document.addEventListener("keydown", (e) => {
+                    if (e.key !== "Escape") return;
+                    const popover = document.getElementById("colorStudioPopover");
+                    if (popover && !popover.classList.contains("hidden")) {
+                        closeColorPopover();
+                        return;
+                    }
+                    const summaryModal = document.getElementById("summaryModal");
+                    if (summaryModal && !summaryModal.classList.contains("hidden")) {
+                        closeSummaryModal();
+                        return;
+                    }
+                    const syncModal = document.getElementById("liveSyncModal");
+                    if (
+                        syncModal &&
+                        !syncModal.classList.contains("hidden") &&
+                        !liveSyncState.isRunning
+                    ) {
+                        closeLiveSyncModal();
                     }
                 });
 
